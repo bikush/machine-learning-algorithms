@@ -7,6 +7,12 @@ id3_algorithm::id3_algorithm(Data_set & data, double p): ds{data.init_train_and_
 	class_vals = ds.attr.get_attr_values(class_name);
 }
 
+id3_algorithm::id3_algorithm(Data_set & data, bool unused) : ds{ data }
+{
+	class_name = ds.get_label_name();
+	class_vals = ds.attr.get_attr_values(class_name);
+}
+
 double id3_algorithm::calculate_entropy(const vector<int> & subset) {
 	set<string> vals = ds.attr.get_attr_values(class_name);
 	double res = 0.0;
@@ -62,6 +68,7 @@ id3_node id3_algorithm::operator()() {
 	}
 	return calculate(subset, ds.attr.get_filtered_attributes());
 }
+
 
 id3_node id3_algorithm::calculate(const vector<int> & subset, const vector<string> & attributes) {
 	for (const auto & val: class_vals) {

@@ -39,11 +39,11 @@ static inline string &trim(string &s) {
 }
 
 int main() {
-
+/*
 	ifstream ifs{"data/tennis.txt"};
 	string class_name = "Play";  // type
 	string name = "Day";/**/
-/*
+
 	ifstream ifs{"data/zoo.txt"};
 	string class_name = "type";  // type
 	string name = "object";
@@ -86,17 +86,42 @@ int main() {
 	/***********************finished with parsing of the input data*************************************/
 
 
+	
+/*
 	cout << "data length: " << ds.get_size() << endl;
-	id3_algorithm id3{ds, 0.65};
+	id3_algorithm id3{ds, 0.8};
 	cout << "train data length: " << ds.get_train_set_size() << endl;
 	id3_node root = id3();
 
-	root.print();
-
-
 	int count = 0;
-	for (int i=0; i< ds.get_test_set_size(); i++) {
-		Data d{ds.get_test_elem(i)};
+	for (int i = 0; i< ds.get_test_set_size(); i++) {
+		Data d{ ds.get_test_elem(i) };
+		string res = root.classify(d, class_name);
+		if (d.get_value(class_name) == res) {
+			cout << d.get_value(name) << " is a " << res << endl;
+			count++;
+		}
+		else
+			cout << d.get_value(name) << " is not a " << res << endl;
+	}
+	cout << "Correctness: " << count / (double)ds.get_test_set_size() << endl;
+	return 0;
+	*/
+	
+	Data_set train;
+	Data_set test;
+	ds.distribute_split(train, test, 0.5);
+
+	cout << "data length: " << train.get_size() << endl;
+	id3_algorithm id3{ train, true };
+	cout << "train data length: " << train.get_train_set_size() << endl;
+	id3_node root = id3();
+
+	root.print();
+	
+	int count = 0;
+	for (int i=0; i< test.get_test_set_size(); i++) {
+		Data d{test.get_test_elem(i)};
 		string res = root.classify(d, class_name);
 		if (d.get_value(class_name) == res){
 			cout << d.get_value(name) << " is a " << res << endl;
@@ -105,6 +130,6 @@ int main() {
 		else
 			cout << d.get_value(name) << " is not a " << res << endl;
 	}
-	cout << "Correctness: " << count/(double)ds.get_test_set_size() << endl;
+	cout << "Correctness: " << count/(double)test.get_test_set_size() << endl;
 	return 0;
 }

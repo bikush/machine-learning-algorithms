@@ -50,7 +50,7 @@ private:
 
 class Data_set {
 public:
-	Data_set(const std::string & l):label_name{l}{}
+	Data_set(const std::string & l = ""):label_name{l}{}
 	void append_data(const Data & d) {data_set.push_back(d);define_attr_values(d);}
 	std::vector<int> split_train_set_by_attr_val(const std::vector<int> & subset, const std::string & att, const std::string & val) const;
 	//std::vector<int> split_test_set_by_attr_val(const std::string & att, const std::string & val) const;
@@ -65,8 +65,13 @@ public:
 	const Data_set & init_train_and_test_set(double percentage);
 	const std::string & get_label_name() const {return label_name; }
 	Attribute_set attr;
+
+	void distribute_split(Data_set & first, Data_set & second, double percentage);
+	void distribute_random(Data_set & first, Data_set & second, double percentage);
+	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold);
 private:
 	void define_attr_values(const Data & d);
+	void clear();
 	std::string label_name;
 	std::vector<Data> data_set;
 	std::vector<Data> training_set;

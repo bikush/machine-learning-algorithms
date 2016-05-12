@@ -6,6 +6,7 @@
  */
 
 #include "Dataset.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -21,6 +22,33 @@ const Data_set & Data_set::init_train_and_test_set(double percentage) {
 		}
 	}
 	return *(this);
+}
+
+void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage)
+{
+	percentage = std::min(1.0, std::max(0.0, percentage));
+	first.attr = attr;
+	first.label_name = label_name;
+	second.attr = attr;
+	second.label_name = label_name;
+	int total_size = get_size();
+	int first_size = int(percentage * total_size);
+	for (int i = 0; i < first_size; i++) {
+		first.data_set.push_back(data_set[i]);
+		first.training_set.push_back(data_set[i]);
+	}
+	for (int i = first_size; i < total_size; i++) {
+		second.data_set.push_back(data_set[i]);
+		second.test_set.push_back(data_set[i]);
+	}	
+}
+
+void Data_set::distribute_random(Data_set & first, Data_set & second, double percentage)
+{
+}
+
+void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold)
+{
 }
 
 vector<int> Data_set::split_train_set_by_attr_val(const vector<int> & subset, const string & att, const string & val) const {
@@ -44,6 +72,15 @@ void Data_set::define_attr_values(const Data & d){
 			attr.get_attr_map()[att].insert(val);
 		}
 	}
+}
+
+void Data_set::clear()
+{
+	label_name = "";
+	data_set.clear();
+	training_set.clear();
+	test_set.clear();
+	attr = Attribute_set{};
 }
 
 vector<string> Attribute_set::get_filtered_attributes() const {
