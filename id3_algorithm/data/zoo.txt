@@ -20,6 +20,8 @@ bear yes no no yes no no yes yes yes yes no no 4 no no yes mammal
 boar yes no no yes no no yes yes yes yes no no 4 yes no yes mammal
 buffalo yes no no yes no no no yes yes yes no no 4 yes no yes mammal
 calf yes no no yes no no no yes yes yes no no 4 yes yes yes mammal
+tortoise no no yes no no no no no yes yes no no 4 yes no yes reptile
+tuatara no no yes no no no yes yes yes yes no no 4 yes no no reptile
 starfish no no yes no no yes yes no no no no no 5 no no no shellfish
 carp no no yes no no yes no yes yes no no yes 0 yes yes no fish
 catfish no no yes no no yes yes yes yes no no yes 0 yes no no fish
@@ -103,8 +105,6 @@ stingray no no yes no no yes yes yes yes no yes yes 0 yes no yes fish
 swan no yes yes no yes yes no no yes yes no no 2 yes no yes bird
 termite no no yes no no no no no no yes no no 6 no no no insect
 toad no no yes no no yes no yes yes yes no no 4 no no no frog
-tortoise no no yes no no no no no yes yes no no 4 yes no yes reptile
-tuatara no no yes no no no yes yes yes yes no no 4 yes no no reptile
 tuna no no yes no no yes yes yes yes no no yes 0 yes no yes fish
 vampire yes no no yes yes no no yes yes yes no no 2 yes no no mammal
 vole yes no no yes no no no yes yes yes no no 4 yes no no mammal
