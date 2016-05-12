@@ -8,11 +8,100 @@
 #include "Dataset.h"
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <functional>
 
 using namespace std;
 
-void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage)
+
+istream & operator>>(istream & is, Data & d) {
+	for (const auto & attr : d.attributes) {
+		string val;
+		if (is >> val) {
+			d.set_value(attr, val);
+		}
+		else {
+			throw runtime_error("Invalid data format");
+		}
+	}
+	return is;
+}
+
+// TODO: move to a utility header
+
+// trim from start
+static inline string &ltrim(string &s) {
+	s.erase(s.begin(), find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace))));
+	return s;
+}
+
+// trim from end
+static inline string &rtrim(string &s) {
+	s.erase(find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(), s.end());
+	return s;
+}
+
+// trim from both ends
+static inline string &trim(string &s) {
+	return ltrim(rtrim(s));
+}
+
+// END TODO
+
+Data_set::Data_set(const std::string & l) :label_name{ l } {
+	std::cout << "Created data set " << l.c_str() << std::endl;
+}
+
+void Data_set::load_simple_db(const std::string & path)
 {
+	load_simple_db(path, label_name);
+}
+
+void Data_set::load_simple_db(const std::string & path, const std::string & class_name){
+	ifstream ifs{ path };
+	if (!ifs) {
+		throw runtime_error("Input file not found.");
+	}
+	label_name = class_name;
+
+	string line;
+	bool db_flag = true;
+	bool metadata = false;
+	string db_name;
+	while (getline(ifs, line)) {
+		line = trim(line);
+		if (line != "" && line[0] != ';') {
+			if (db_flag) {
+				db_flag = false;
+				metadata = true;
+				db_name = line;
+				// the database name is the first line
+			}
+			else {
+				istringstream is{ line };
+				if (metadata) {
+					metadata = false;
+					string attr_val;
+					string attr_type;
+					while (is >> attr_val && is >> attr_type) {
+						Attribute new_attr{ attr_val, attr_type, !(attr_type == "name" || attr_val == class_name) };
+						attr.append_attr(new_attr);
+					}
+				}
+				else {
+					Data d{ attr.get_all_attributes() };
+					is >> d;
+					append_data(d);
+				}
+			}
+
+		}
+
+	}
+}
+
+void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage){
 	percentage = std::min(1.0, std::max(0.0, percentage));
 	first.attr = attr;
 	first.label_name = label_name;
@@ -75,7 +164,6 @@ vector<string> Attribute_set::get_filtered_attributes() const {
 	}
 	return res;
 }
-
 
 const set<string> & Attribute_set::get_attr_values(const string & attr) const{
 	return attr_map.at(attr);

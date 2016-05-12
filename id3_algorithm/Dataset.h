@@ -50,7 +50,11 @@ private:
 
 class Data_set {
 public:
-	Data_set(const std::string & l = ""):label_name{l}{}
+	Data_set(const std::string & l = "");
+
+	void load_simple_db(const std::string & path);
+	void load_simple_db(const std::string & path, const std::string & class_name);
+
 	void append_data(const Data & d) {data_set.push_back(d);define_attr_values(d);}
 	std::vector<int> split_by_attr_val(const std::vector<int> & subset, const std::string & att, const std::string & val) const;
 	
