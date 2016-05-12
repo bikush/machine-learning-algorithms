@@ -52,17 +52,11 @@ class Data_set {
 public:
 	Data_set(const std::string & l = ""):label_name{l}{}
 	void append_data(const Data & d) {data_set.push_back(d);define_attr_values(d);}
-	std::vector<int> split_train_set_by_attr_val(const std::vector<int> & subset, const std::string & att, const std::string & val) const;
-	//std::vector<int> split_test_set_by_attr_val(const std::string & att, const std::string & val) const;
+	std::vector<int> split_by_attr_val(const std::vector<int> & subset, const std::string & att, const std::string & val) const;
+	
 	const Data & get_elem(int idx) const { return data_set[idx];}
 	int get_size() const { return data_set.size();}
-	const Data & get_train_elem(int idx) const { return training_set[idx];}
-	int get_train_set_size() const { return training_set.size();}
 
-	const Data & get_test_elem(int idx) const { return test_set[idx];}
-	int get_test_set_size() const {return test_set.size();}
-
-	const Data_set & init_train_and_test_set(double percentage);
 	const std::string & get_label_name() const {return label_name; }
 	Attribute_set attr;
 
@@ -74,8 +68,6 @@ private:
 	void clear();
 	std::string label_name;
 	std::vector<Data> data_set;
-	std::vector<Data> training_set;
-	std::vector<Data> test_set;
 };
 
 #endif /* DATASET_H_ */

@@ -2,12 +2,7 @@
 #include <iostream>
 using namespace std;
 
-id3_algorithm::id3_algorithm(Data_set & data, double p): ds{data.init_train_and_test_set(p)} {
-	class_name = ds.get_label_name();
-	class_vals = ds.attr.get_attr_values(class_name);
-}
-
-id3_algorithm::id3_algorithm(Data_set & data, bool unused) : ds{ data }
+id3_algorithm::id3_algorithm(Data_set & data) : ds{ data }
 {
 	class_name = ds.get_label_name();
 	class_vals = ds.attr.get_attr_values(class_name);
@@ -17,7 +12,7 @@ double id3_algorithm::calculate_entropy(const vector<int> & subset) {
 	set<string> vals = ds.attr.get_attr_values(class_name);
 	double res = 0.0;
 	for (const auto &val: vals) {
-		vector<int> indexes = ds.split_train_set_by_attr_val(subset, class_name, val);
+		vector<int> indexes = ds.split_by_attr_val(subset, class_name, val);
 		if( indexes.size() == 0 )
 			continue;
 
@@ -31,11 +26,11 @@ double id3_algorithm::calculate_gain(const string & att, const vector<int> & sub
 	set<string> vals = ds.attr.get_attr_values(att);
 	double res = 0.0;
 	for (const auto &val: vals) {
-		vector<int> indexes = ds.split_train_set_by_attr_val(subset, att, val);
+		vector<int> indexes = ds.split_by_attr_val(subset, att, val);
 		if( indexes.size() == 0 )
 			continue;
 
-		double p = double(indexes.size())/ds.get_train_set_size();
+		double p = double(indexes.size())/ds.get_size();
 		res += p * calculate_entropy(indexes);
 	}
 	cout << att << " gain " << res << endl;
@@ -48,7 +43,7 @@ string id3_algorithm::find_most_common_class(const vector<int> & subset) {
 	for (const auto & val: class_vals) {
 		int num = 0;
 		for (int i: subset) {
-			if (ds.get_train_elem(i).get_value(class_name) == val) {
+			if (ds.get_elem(i).get_value(class_name) == val) {
 				num += 1;
 			}
 		}
@@ -62,8 +57,8 @@ string id3_algorithm::find_most_common_class(const vector<int> & subset) {
 
 id3_node id3_algorithm::operator()() {
 	vector<int> subset;
-	subset.reserve(ds.get_train_set_size());
-	for (int i=0; i< ds.get_train_set_size(); i++) {
+	subset.reserve(ds.get_size());
+	for (int i=0; i< ds.get_size(); i++) {
 		subset.push_back(i);
 	}
 	return calculate(subset, ds.attr.get_filtered_attributes());
@@ -74,7 +69,7 @@ id3_node id3_algorithm::calculate(const vector<int> & subset, const vector<strin
 	for (const auto & val: class_vals) {
 		bool all_the_same= true;
 		for (int i: subset) {
-			if (ds.get_train_elem(i).get_value(class_name) !=val) {
+			if (ds.get_elem(i).get_value(class_name) !=val) {
 				all_the_same = false;
 				break;
 			}
@@ -112,7 +107,7 @@ id3_node id3_algorithm::calculate(const vector<int> & subset, const vector<strin
 	auto vals = ds.attr.get_attr_values(attribute);
 	id3_node new_node{attribute, vals};
 	for (const auto & v : vals) {
-		vector<int> res = ds.split_train_set_by_attr_val(subset, attribute, v);
+		vector<int> res = ds.split_by_attr_val(subset, attribute, v);
 
 		if (res.size()) {
 			new_node.add_a_child(v, calculate(res, attr));

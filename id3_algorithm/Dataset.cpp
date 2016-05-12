@@ -7,22 +7,9 @@
 
 #include "Dataset.h"
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
-
-const Data_set & Data_set::init_train_and_test_set(double percentage) {
-	int train_size = int(percentage * get_size());
-	training_set.clear();
-	test_set.clear();
-	for (int i=0; i<get_size(); i++) {
-		if (i<train_size) {
-			training_set.push_back(data_set[i]);
-		} else {
-			test_set.push_back(data_set[i]);
-		}
-	}
-	return *(this);
-}
 
 void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage)
 {
@@ -35,11 +22,9 @@ void Data_set::distribute_split(Data_set & first, Data_set & second, double perc
 	int first_size = int(percentage * total_size);
 	for (int i = 0; i < first_size; i++) {
 		first.data_set.push_back(data_set[i]);
-		first.training_set.push_back(data_set[i]);
 	}
 	for (int i = first_size; i < total_size; i++) {
 		second.data_set.push_back(data_set[i]);
-		second.test_set.push_back(data_set[i]);
 	}	
 }
 
@@ -51,11 +36,12 @@ void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_cou
 {
 }
 
-vector<int> Data_set::split_train_set_by_attr_val(const vector<int> & subset, const string & att, const string & val) const {
+vector<int> Data_set::split_by_attr_val(const vector<int> & subset, const string & att, const string & val) const {
 	vector<int> idxs;
 	for (size_t i=0; i<subset.size(); i++) {
 		int idx = subset[i];
-		if (training_set[idx].get_value(att) == val) {
+		// TODO: valid idx?
+		if (data_set[idx].get_value(att) == val) {
 			idxs.push_back(idx);
 		}
 	}
@@ -78,8 +64,6 @@ void Data_set::clear()
 {
 	label_name = "";
 	data_set.clear();
-	training_set.clear();
-	test_set.clear();
 	attr = Attribute_set{};
 }
 

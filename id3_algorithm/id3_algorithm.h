@@ -9,8 +9,7 @@
 
 class id3_algorithm{
 public:
-	id3_algorithm(Data_set & data, double p=0.8);
-	id3_algorithm(Data_set & data, bool unused);
+	id3_algorithm(Data_set & data);
 	id3_node operator()();
 private:
 	id3_node calculate(const std::vector<int> &, const std::vector<std::string> &);
