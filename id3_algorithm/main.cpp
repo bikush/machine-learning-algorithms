@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <functional>
 #include <stdexcept>
 #include "Dataset.h"
 #include "id3_algorithm.h"

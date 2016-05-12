@@ -10,7 +10,7 @@
 using namespace std;
 
 const Data_set & Data_set::init_train_and_test_set(double percentage) {
-	int train_size = percentage * get_size();
+	int train_size = int(percentage * get_size());
 	training_set.clear();
 	test_set.clear();
 	for (int i=0; i<get_size(); i++) {
