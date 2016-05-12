@@ -3,7 +3,6 @@
 
 #include "Dataset.h"
 #include "id3tree.h"
-#include <math.h>
 #include <algorithm>
 #include <vector>
 

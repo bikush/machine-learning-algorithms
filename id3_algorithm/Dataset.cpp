@@ -119,10 +119,12 @@ void Data_set::distribute_split(Data_set & first, Data_set & second, double perc
 
 void Data_set::distribute_random(Data_set & first, Data_set & second, double percentage)
 {
+	// TODO: randomly select a percentage of elements into first and (1-percentage) into second
 }
 
 void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold)
 {
+	// TODO: split date into fold_count parts, place take_fold-th fold into second, place rest into first
 }
 
 vector<int> Data_set::split_by_attr_val(const vector<int> & subset, const string & att, const string & val) const {
