@@ -30,7 +30,6 @@ double Neural_network::generate_init_weight() {
 	mt19937 gen(rd());
 	uniform_real_distribution<> dist(0.1,1.0);
 	return dist(gen);
-	//return 0.5;
 }
 
 void Neural_network::build_network() {
@@ -53,6 +52,7 @@ double activation_func(double net) {
 void Neural_network::calculate_outputs() {
 	for (int i=1; i < num_layers; i++) {
 		for (int j=0; j<neurons_per_layer[i]; j++) {
+			if (is_bias(i, j)) continue;
 			auto keys = neurons_at_layer[i][j].in_edges_keys();
 			double res = 0.0;
 			for (const auto & key: keys) {
@@ -69,9 +69,15 @@ double activation_func_der(double out) {
 	return out*(1.-out);
 }
 
+void Neural_network::set_weight(double w, const Edge_key & k){
+	neurons_at_layer[k.layer][k.in].out_edges_weights(k) = w;
+	neurons_at_layer[k.layer+1][k.out].in_edges_weights(k) = w;
+}
+
 bool Neural_network::back_propagation(const vector<double> & targets) {
 	bool res = true;
 	map<Edge_key, double> sigmas;
+	map<Edge_key, double> old_weights;
 	/*check error! */
 	for (int i=0; i<neurons_per_layer[num_layers-1]; i++) {
 		if (abs(neurons_at_layer[num_layers-1][i].get_out() - targets[i]) >= ok) {
@@ -79,7 +85,6 @@ bool Neural_network::back_propagation(const vector<double> & targets) {
 			break;
 		}
 	}
-
 	/*calculate out_sigmas and set weights for output layer*/
 	for (int i=0; i<neurons_per_layer[num_layers-1]; i++) {
 		Neuron & n = neurons_at_layer[num_layers-1][i];
@@ -88,24 +93,28 @@ bool Neural_network::back_propagation(const vector<double> & targets) {
 			Neuron & in = neurons_at_layer[key.layer][key.in];
 			sigmas[key] = -(targets[i] - n.get_out()) * activation_func_der(n.get_out());
 			double w = in.out_edges_weights(key);
-			in.out_edges_weights(key) = w - sigmas[key]*eta*in.get_out();
+			old_weights[key] = w;
+			set_weight(w - sigmas[key]*eta*in.get_out(), key);
 		}
 	}
 	for (int i=num_layers-2; i >= 1; i--) {
 		for (int j=0; j<neurons_per_layer[i]; j++) {
 			Neuron & n = neurons_at_layer[i][j];
+			if (is_bias(i, j)) continue;
 			vector<Edge_key> keys = n.in_edges_keys();
 			vector<Edge_key> sigma_keys = n.out_edges_keys();
 			for (const auto & key:keys) {
-				Neuron & in = neurons_at_layer[i-1][key.in];
-				sigmas[key] = activation_func_der(n.get_out());
+				Neuron & in = neurons_at_layer[key.layer][key.in];
+				double r = activation_func_der(n.get_out());
+				sigmas[key] = r;
 				double sum = 0.0;
 				for (const auto & sk: sigma_keys) {
-					sum += sigmas[sk]*n.out_edges_weights(sk);
+					sum += sigmas[sk]*old_weights[sk];
 				}
 				sigmas[key] *= sum;
 				double w = in.out_edges_weights(key);
-				in.out_edges_weights(key) = w - eta*sigmas[key]*in.get_out();
+				old_weights[key] = w;
+				set_weight(w - sigmas[key]*eta*in.get_out(), key);
 			}
 		}
 	}
@@ -113,6 +122,18 @@ bool Neural_network::back_propagation(const vector<double> & targets) {
 	return res;
 }
 
+void Neural_network::test(Neural_network & nn, const vector<double> & inputs, const vector<double> & targets) {
+	vector<double> res = nn.calculate(inputs);
+	cout << "Neural network test with inputs:" << endl;
+	for (size_t i=0; i<inputs.size(); i++) {
+		cout << "input[" << i << "] = " << inputs[i] << endl;
+	}
+	for (size_t i=0; i<res.size(); i++) {
+		cout << "output[" << i << "] = " << res[i] << endl;
+		cout << "ERROR = " <<  abs(targets[i] -res[i]) << endl;
+	}
+	cout << endl;
+}
 vector<double> Neural_network::calculate(const vector<double> & inputs){
 	vector<double> out(neurons_per_layer[num_layers-1]);
 	for (size_t i=0; i < inputs.size(); i++) {
@@ -151,12 +172,7 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 			/*calculate outputs*/
 			calculate_outputs();
 			/*set new weights*/
-			if (back_propagation(targets)) {
-				/*
-				cout<< "hey, I'm corect here: " << epoch_count << " iteration: " << current << endl;
-				cout<< "inputs: " << neurons_at_layer[0][0].get_out() << " " << neurons_at_layer[0][1].get_out() << endl;
-				cout<< "output: " << neurons_at_layer[num_layers-1][0].get_out() << endl; */
-			}
+			back_propagation(targets);
 		}
 
 	}

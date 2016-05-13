@@ -9,6 +9,7 @@
 #define NEURON_H_
 #include <map>
 #include <vector>
+#include <sstream>
 
 struct Edge_key {
 	Edge_key(int l=0, int i=0, int o=0): layer{l}, in{i}, out{o}{}
@@ -16,7 +17,11 @@ struct Edge_key {
 	int in;
 	int out;
 	bool operator<(const Edge_key& key) const{
-		return (layer < key.layer || in < key.in || out < key.out );
+		std::stringstream ss1{};
+		std::stringstream ss2{};
+		ss1<<layer<< " " <<in<< " " << out;
+		ss2<<key.layer<< " " <<key.in<< " " << key.out;
+		return (ss1.str() < ss2.str());
 	}
 
 };

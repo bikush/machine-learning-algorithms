@@ -19,10 +19,10 @@ class Neural_network {
 public:
 	Neural_network(const std::vector<int> & init, double learning_rate=0.01, double acceptable_error=0.01);
 	void operator() (const std::vector<std::vector<double>> &, const std::vector<std::vector<double>> &, int);
-	std::vector<double> calculate(const std::vector<double> & inputs);
 	double get_learning_rate(){return eta;}
 	void set_learning_rate(double lr) {eta = lr;}
-	bool is_bias(int layer, int idx){return (config[layer] == idx);}
+	static void test(Neural_network & nn, const std::vector<double> & inputs, const std::vector<double> & targets);
+	std::vector<double> calculate(const std::vector<double> & inputs);
 private:
 	double eta;
 	double ok;
@@ -34,5 +34,7 @@ private:
 	double generate_init_weight();
 	void build_network();
 	void calculate_outputs();
+	bool is_bias(int layer, int idx){return (config[layer] == idx);}
+	void set_weight(double w, const Edge_key & k);
 };
 #endif /* NEURALNETWORK_H_ */
