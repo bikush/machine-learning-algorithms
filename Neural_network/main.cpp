@@ -23,18 +23,18 @@ int main () {
 
 	/*sine example:*/
 
-	vector<int> init{1, 2, 1};
+	vector<int> init{1, 3, 1};
 	vector<vector<double>> inputs(1);
 	vector<vector<double>> outputs(1);
 	Neural_network nn{init, 0.1};
 
-	inputs[0] = vector<double>(50);
-	outputs[0] = vector<double>(50);
+	inputs[0] = vector<double>(30);
+	outputs[0] = vector<double>(30);
 	for (size_t i=0; i < inputs[0].size(); i++) {
 		inputs[0][i] = i*M_PI*2./double(inputs[0].size());
 		outputs[0][i] = sin(inputs[0][i]);
 	}
-	nn(inputs, outputs, 10000);
+	nn(inputs, outputs, 20000);
 
 	Neural_network::test(nn, vector<double>{0.}, vector<double>{sin(0.)});
 	Neural_network::test(nn, vector<double>{0.5}, vector<double>{sin(0.5)});
@@ -42,6 +42,8 @@ int main () {
 	Neural_network::test(nn, vector<double>{3.1}, vector<double>{sin(3.1)});
 	Neural_network::test(nn, vector<double>{4.}, vector<double>{sin(4.)});
 	Neural_network::test(nn, vector<double>{4.5}, vector<double>{sin(4.5)});
+	Neural_network::test(nn, vector<double>{5.}, vector<double>{sin(5)});
+	Neural_network::test(nn, vector<double>{6.}, vector<double>{sin(6)});
 	/**/
 
 	return 0;
