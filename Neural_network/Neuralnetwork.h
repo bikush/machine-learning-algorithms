@@ -13,24 +13,26 @@
 #include <random>
 #include <assert.h>
 #include <math.h>
+#include <iostream>
 
 class Neural_network {
 public:
-	Neural_network(const std::vector<int> & init, double learning_rate=0.01, double acceptable_error=0.0001);
+	Neural_network(const std::vector<int> & init, double learning_rate=0.01, double acceptable_error=0.01);
 	void operator() (const std::vector<std::vector<double>> &, const std::vector<std::vector<double>> &, int);
 	std::vector<double> calculate(const std::vector<double> & inputs);
 	double get_learning_rate(){return eta;}
 	void set_learning_rate(double lr) {eta = lr;}
+	bool is_bias(int layer, int idx){return (config[layer] == idx);}
 private:
 	double eta;
 	double ok;
 	int num_layers;
+	std::vector<int> config;
 	std::vector<int> neurons_per_layer;
 	std::vector<std::vector<Neuron>> neurons_at_layer;
 	bool back_propagation(const std::vector<double> & targets);
 	double generate_init_weight();
 	void build_network();
 	void calculate_outputs();
-	void set_weight(double, int layer, int neuron_in, int neuron_out);
 };
 #endif /* NEURALNETWORK_H_ */
