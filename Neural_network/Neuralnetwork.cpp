@@ -8,18 +8,19 @@
 #include "Neuralnetwork.h"
 using namespace std;
 
-Neural_network::Neural_network(const vector<int> & init) {
+Neural_network::Neural_network(const vector<int> & init, double learning_rate, double acceptable_error):
+		eta{learning_rate}, ok{acceptable_error} {
 	if (init.size() <= 2) throw runtime_error("Invalid initialization of neural network");
 	num_layers = init.size();
 	for (int i=0; i < num_layers; i++) {
-		neurons_per_layer[i] = init[i];
+		neurons_per_layer.push_back(init[i]);
 	}
 	/*add bias*/
 	for (int i=0; i < num_layers-1; i++) {
 		neurons_per_layer[i]++;
 	}
 	for (int i=0; i < num_layers; i++) {
-		neurons_at_layer[i] = vector<Neuron>(neurons_per_layer[i]);
+		neurons_at_layer.push_back(vector<Neuron>(neurons_per_layer[i]));
 	}
 	build_network();
 }
@@ -50,7 +51,12 @@ void Neural_network::set_weight(double w, int layer, int neuron_in, int neuron_o
 	neurons_at_layer[layer+1][neuron_out].in_edges_weights(k) = w;
 }
 
-void Neural_network::calculate() {
+double activation_func(double net) {
+	double res = 0;
+	res = 1./(1.+exp(-net));
+	return res;
+}
+void Neural_network::calculate_outputs() {
 	for (int i=1; i < num_layers; i++) {
 		for (int j=0; j<neurons_per_layer[i]; j++) {
 			auto keys = neurons_at_layer[i][j].in_edges_keys();
@@ -60,9 +66,69 @@ void Neural_network::calculate() {
 				double w =  neurons_at_layer[key.layer][key.in].out_edges_weights(key);
 				res += out*w;
 			}
-			neurons_at_layer[i][j].set_out(res);
+			neurons_at_layer[i][j].set_out(activation_func(res));
 		}
 	}
+}
+
+double activation_func_der(double out) {
+	return out*(1.-out);
+}
+
+bool Neural_network::back_propagation(const vector<double> & targets) {
+	bool res = true;
+	map<Edge_key, double> sigmas;
+	/*check error!*/
+	for (int i=0; i<neurons_per_layer[num_layers-1]; i++) {
+		if (abs(neurons_at_layer[num_layers-1][i].get_out() - targets[i]) >= ok) {
+			res = false;
+			break;
+		}
+	}
+	if (res) return res;
+	/*calculate out_sigmas and set weights for output layer*/
+	for (int i=0; i<neurons_per_layer[num_layers-1]; i++) {
+		Neuron & n = neurons_at_layer[num_layers-1][i];
+		vector<Edge_key> keys = n.in_edges_keys();
+		for (const auto & key:keys) {
+			Neuron & in = neurons_at_layer[key.layer][key.in];
+			sigmas[key] = - (targets[i] - n.get_out()) * activation_func_der(in.get_out());
+			double w = in.out_edges_weights(key);
+			in.out_edges_weights(key) = w - sigmas[key]*eta*in.get_out();
+		}
+	}
+	for (int i=num_layers-2; i >= 1; i--) {
+		for (int j=0; j<neurons_per_layer[i]; j++) {
+			Neuron & n = neurons_at_layer[i][j];
+			vector<Edge_key> keys = n.in_edges_keys();
+			vector<Edge_key> sigma_keys = n.out_edges_keys();
+			for (const auto & key:keys) {
+				Neuron & in = neurons_at_layer[i-1][key.in];
+				sigmas[key] = activation_func_der(in.get_out());
+				double sum = 0.0;
+				for (const auto & sk: sigma_keys) {
+					sum += sigmas[sk]*n.out_edges_weights(sk);
+				}
+				sigmas[key] *= sum;
+				double w = in.out_edges_weights(key);
+				in.out_edges_weights(key) = w - eta*sigmas[key]*in.get_out();
+			}
+		}
+	}
+
+	return res;
+}
+
+vector<double> Neural_network::calculate(const vector<double> & inputs){
+	vector<double> out(neurons_per_layer[num_layers-1]);
+	for (size_t i=0; i < inputs.size(); i++) {
+		neurons_at_layer[0][i].set_out(inputs[i]);
+	}
+	calculate_outputs();
+	for (size_t i=0; i < out.size(); i++) {
+		out[i] = neurons_at_layer[num_layers-1][i].get_out();
+	}
+	return out;
 }
 
 void Neural_network::operator() (const vector<vector<double>> & inputs, const vector<vector<double>> & outputs, int epoch_count){
@@ -76,7 +142,7 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 	assert(inputs.size() == neurons_at_layer[0].size()-1);
 	assert(outputs.size() == neurons_at_layer[num_layers-1].size());
 
-	vector <vector<double>> target(outputs.size()); // target outputs
+	vector <double> targets(outputs.size()); // target outputs
 
 	while(epoch_count--) {
 		for (size_t current=0; current < data_size; current++) {
@@ -86,11 +152,15 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 			}
 			/*init target*/
 			for (size_t i=0; i < outputs.size(); i++) {
-				target[i].push_back(outputs[i][current]);
+				targets[i] = outputs[i][current];
 			}
 			/*calculate outputs*/
-			calculate();
-
+			calculate_outputs();
+			/*set new weights*/
+			if (back_propagation(targets)) {
+				epoch_count = 0;
+				break;
+			}
 		}
 
 	}
