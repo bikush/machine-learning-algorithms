@@ -90,9 +90,10 @@ bool Neural_network::back_propagation(const vector<double> & targets) {
 	for (int i=0; i<neurons_per_layer[num_layers-1]; i++) {
 		Neuron & n = neurons_at_layer[num_layers-1][i];
 		vector<Edge_key> keys = n.in_edges_keys();
+		double new_sig_val = -(targets[i] - n.get_out()) * activation_func_der(n.get_out());;
 		for (const auto & key:keys) {
 			Neuron & in = neurons_at_layer[key.layer][key.in];
-			sigmas[key] = -(targets[i] - n.get_out()) * activation_func_der(n.get_out());
+			sigmas[key] = new_sig_val;
 			double w = in.out_edges_weights(key);
 			old_weights[key] = w;
 			set_weight(w - sigmas[key]*eta*in.get_out(), key);
@@ -104,9 +105,9 @@ bool Neural_network::back_propagation(const vector<double> & targets) {
 			if (is_bias(i, j)) continue;
 			vector<Edge_key> keys = n.in_edges_keys();
 			vector<Edge_key> sigma_keys = n.out_edges_keys();
+			double r = activation_func_der(n.get_out());
 			for (const auto & key:keys) {
 				Neuron & in = neurons_at_layer[key.layer][key.in];
-				double r = activation_func_der(n.get_out());
 				sigmas[key] = r;
 				double sum = 0.0;
 				for (const auto & sk: sigma_keys) {
