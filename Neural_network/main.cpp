@@ -43,13 +43,13 @@ int main () {
 	vector<vector<double>> outputs(1);
 	Neural_network nn{init, 0.6};
 
-	inputs[0] = vector<double>(30);
-	outputs[0] = vector<double>(30);
+	inputs[0] = vector<double>(50);
+	outputs[0] = vector<double>(50);
 	generate_sin(inputs[0], outputs[0]);
 	transform_values(inputs[0], 0.0, 1/(M_PI*2.0));
 	transform_values(outputs[0], 0.5, 0.5);
 
-	nn(inputs, outputs, 10000);
+	nn(inputs, outputs, 100000);
 
 	vector<vector<double>> t_inputs(1);
 	vector<vector<double>> t_outputs(1);
@@ -62,7 +62,7 @@ int main () {
 	double total_error = 0.0;
 	double min_error = 1.0;
 	double max_error = 0.0;
-	for (int i = 0; i < t_inputs[0].size(); i++) {
+	for (size_t i = 0; i < t_inputs[0].size(); i++) {
 		double error = Neural_network::test(nn, vector<double>{t_inputs[0][i]}, vector<double>{t_outputs[0][i]});
 		total_error += error;
 		min_error = min(min_error, error);
