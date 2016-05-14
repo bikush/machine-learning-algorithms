@@ -21,7 +21,7 @@ public:
 	void operator() (const std::vector<std::vector<double>> &, const std::vector<std::vector<double>> &, int);
 	double get_learning_rate(){return eta;}
 	void set_learning_rate(double lr) {eta = lr;}
-	static void test(Neural_network & nn, const std::vector<double> & inputs, const std::vector<double> & targets);
+	static double test(Neural_network & nn, const std::vector<double> & inputs, const std::vector<double> & targets);
 	std::vector<double> calculate(const std::vector<double> & inputs);
 private:
 	double eta;

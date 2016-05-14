@@ -1,7 +1,22 @@
 #define _USE_MATH_DEFINES
 #include <iostream>
+#include <algorithm>
 #include "Neuralnetwork.h"
 using namespace std;
+
+void transform_values(vector<double> & values, double offset, double scale) {
+	for (size_t i = 0; i < values.size(); i++) {
+		values[i] = values[i] * scale + offset;
+	}
+}
+
+void generate_sin(vector<double> & values, vector<double> & res) {
+	size_t size = values.size();
+	for (size_t i = 0; i < size; i++) {
+		values[i] = i*M_PI*2.0 / size;
+		res[i] = sin(values[i]);
+	}
+}
 
 int main () {
 	/* xor example:*/
@@ -26,26 +41,38 @@ int main () {
 	vector<int> init{1, 3, 1};
 	vector<vector<double>> inputs(1);
 	vector<vector<double>> outputs(1);
-	Neural_network nn{init, 0.2};
+	Neural_network nn{init, 0.6};
 
 	inputs[0] = vector<double>(30);
 	outputs[0] = vector<double>(30);
-	for (size_t i=0; i < inputs[0].size(); i++) {
-		inputs[0][i] = i*M_PI*2./double(inputs[0].size());
-		outputs[0][i] = (1 + sin(inputs[0][i]))/2;
-		inputs[0][i] /= (M_PI*2.);
-	}
-	nn(inputs, outputs, 20000);
+	generate_sin(inputs[0], outputs[0]);
+	transform_values(inputs[0], 0.0, 1/(M_PI*2.0));
+	transform_values(outputs[0], 0.5, 0.5);
 
-	Neural_network::test(nn, vector<double>{0./(M_PI*2.)}, vector<double>{(1.+sin(0.))/2.});
-	Neural_network::test(nn, vector<double>{0.5/(M_PI*2.)}, vector<double>{(1.+sin(0.5))/2.});
-	Neural_network::test(nn, vector<double>{1.5/(M_PI*2.)}, vector<double>{(1.+sin(1.5))/2.});
-	Neural_network::test(nn, vector<double>{3.1/(M_PI*2.)}, vector<double>{(1.+sin(3.1))/2.});
-	Neural_network::test(nn, vector<double>{4./(M_PI*2.)}, vector<double>{(1.+sin(4.))/2.});
-	Neural_network::test(nn, vector<double>{4.5/(M_PI*2.)}, vector<double>{(1.+sin(4.5))/2.});
-	Neural_network::test(nn, vector<double>{5./(M_PI*2.)}, vector<double>{(1.+sin(5))/2.});
-	Neural_network::test(nn, vector<double>{6./(M_PI*2.)}, vector<double>{(1.+sin(6))/2.});
-	/**/
+	nn(inputs, outputs, 10000);
+
+	vector<vector<double>> t_inputs(1);
+	vector<vector<double>> t_outputs(1);
+	t_inputs[0] = vector<double>(200);
+	t_outputs[0] = vector<double>(200);
+	generate_sin(t_inputs[0], t_outputs[0]);
+	transform_values(t_inputs[0], 0.0, 1 / (M_PI*2.0));
+	transform_values(t_outputs[0], 0.5, 0.5);
+
+	double total_error = 0.0;
+	double min_error = 1.0;
+	double max_error = 0.0;
+	for (int i = 0; i < t_inputs[0].size(); i++) {
+		double error = Neural_network::test(nn, vector<double>{t_inputs[0][i]}, vector<double>{t_outputs[0][i]});
+		total_error += error;
+		min_error = min(min_error, error);
+		max_error = max(max_error, error);
+	}
+	total_error /= t_inputs[0].size();
+	cout << "total error: " << total_error << endl;
+	cout << "min error: " << min_error << endl;
+	cout << "max error: " << max_error << endl;
+	cout << "avg span: " << (max_error - min_error) / 2.0 << endl;
 
 	return 0;
 }

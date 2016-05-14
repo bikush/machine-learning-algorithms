@@ -123,8 +123,9 @@ bool Neural_network::back_propagation(const vector<double> & targets) {
 	return res;
 }
 
-void Neural_network::test(Neural_network & nn, const vector<double> & inputs, const vector<double> & targets) {
+double Neural_network::test(Neural_network & nn, const vector<double> & inputs, const vector<double> & targets) {
 	vector<double> res = nn.calculate(inputs);
+	double coumpound_error = 0.0;
 	cout << "Neural network test with inputs:" << endl;
 	for (size_t i=0; i<inputs.size(); i++) {
 		cout << "input[" << i << "] = " << inputs[i] << endl;
@@ -132,9 +133,11 @@ void Neural_network::test(Neural_network & nn, const vector<double> & inputs, co
 	for (size_t i=0; i<res.size(); i++) {
 		cout << "output[" << i << "] = " << res[i] << endl;
 		cout << "expected output: " << targets[i] << endl;
+		coumpound_error += abs(targets[i] - res[i]);
 		cout << "ERROR = " <<  abs(targets[i] -res[i]) << endl;
 	}
 	cout << endl;
+	return coumpound_error / res.size();
 }
 vector<double> Neural_network::calculate(const vector<double> & inputs){
 	vector<double> out(neurons_per_layer[num_layers-1]);
