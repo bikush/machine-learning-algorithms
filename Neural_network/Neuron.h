@@ -12,17 +12,20 @@
 #include <sstream>
 
 struct Edge_key {
-	Edge_key(int l=0, int i=0, int o=0): layer{l}, in{i}, out{o}{}
+	Edge_key(int l = 0, int i = 0, int o = 0) : layer{ l }, in{ i }, out{ o } {
+		std::stringstream ss1{};
+		ss1<<layer<< " " <<in<< " " << out;
+		desc = ss1.str();
+	}
 	int layer;
 	int in;
 	int out;
+	
 	bool operator<(const Edge_key& key) const{
-		std::stringstream ss1{};
-		std::stringstream ss2{};
-		ss1<<layer<< " " <<in<< " " << out;
-		ss2<<key.layer<< " " <<key.in<< " " << key.out;
-		return (ss1.str() < ss2.str());
+		return desc < key.desc;
 	}
+private:
+	std::string desc;
 
 };
 
