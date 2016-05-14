@@ -6,6 +6,7 @@
  */
 
 #include "Neuralnetwork.h"
+#include <chrono>
 using namespace std;
 
 Neural_network::Neural_network(const vector<int> & init, double learning_rate, double acceptable_error):
@@ -159,8 +160,14 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 
 	vector <double> targets(outputs.size()); // target outputs
 
+	std::chrono::time_point<std::chrono::high_resolution_clock> start, end, total_start;
+	double calculation = 0.0;
+	double backpropagation = 0.0;
+	total_start = std::chrono::high_resolution_clock::now();
+
 	while(epoch_count--) {
-		for (size_t current=0; current < data_size; current++) {
+		//cout << epoch_count << endl;
+		for (size_t current=0; current < data_size; current++) {			
 			/*init inputs*/
 			for (size_t i=0; i < inputs.size(); i++) {
 				neurons_at_layer[0][i].set_out(inputs[i][current]);
@@ -169,11 +176,27 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 			for (size_t i=0; i < outputs.size(); i++) {
 				targets[i] = outputs[i][current];
 			}
+
+			start = std::chrono::high_resolution_clock::now();
+
 			/*calculate outputs*/
 			calculate_outputs();
+
+			end = std::chrono::high_resolution_clock::now();
+			calculation += (std::chrono::duration<double>(end - start)).count();
+			start = end;
+			
 			/*set new weights*/
 			back_propagation(targets);
-		}
 
+			end = std::chrono::high_resolution_clock::now();
+			backpropagation += (std::chrono::duration<double>(end - start)).count();
+		}
 	}
+
+	std::chrono::duration<double> total_duration = std::chrono::high_resolution_clock::now() - total_start;
+	cout << "total duration " << total_duration.count() << "s" << endl;
+	cout << "calc " << calculation << "s (" << 100.0 * calculation / total_duration.count() << "%)" << endl;
+	cout << "back " << backpropagation << "s (" << 100.0 *  backpropagation / total_duration.count() << "%)" << endl;
+
 }

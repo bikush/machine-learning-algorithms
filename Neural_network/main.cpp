@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <iostream>
 #include "Neuralnetwork.h"
 using namespace std;
