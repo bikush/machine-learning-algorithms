@@ -67,6 +67,9 @@ public:
 	void distribute_split(Data_set & first, Data_set & second, double percentage);
 	void distribute_random(Data_set & first, Data_set & second, double percentage);
 	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold);
+	// * * * * * * * *
+	// f_c = 4, t_f = 1
+	// f f|s s|f f|f f
 private:
 	void define_attr_values(const Data & d);
 	void clear();

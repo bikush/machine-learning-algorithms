@@ -15,7 +15,7 @@ private:
 	std::string find_most_common_class(const std::vector<int> & subset);
 	double calculate_entropy(const std::vector<int> &);
 	double calculate_gain(const std::string & att, const std::vector<int> & subset);
-	const Data_set ds;
+	const Data_set & ds;
 	std::string class_name;
 	std::set<std::string> class_vals;
 };
