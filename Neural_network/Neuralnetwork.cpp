@@ -131,6 +131,7 @@ void Neural_network::test(Neural_network & nn, const vector<double> & inputs, co
 	}
 	for (size_t i=0; i<res.size(); i++) {
 		cout << "output[" << i << "] = " << res[i] << endl;
+		cout << "expected output: " << targets[i] << endl;
 		cout << "ERROR = " <<  abs(targets[i] -res[i]) << endl;
 	}
 	cout << endl;
