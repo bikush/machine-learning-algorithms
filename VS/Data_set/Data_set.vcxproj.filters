@@ -15,29 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\id3_algorithm\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\id3_algorithm\id3tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\id3_algorithm\id3_algorithm.cpp">
+    <ClCompile Include="..\..\Data_set\Dataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\data\tennis.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="..\data\zoo.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\id3_algorithm\id3_algorithm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\id3_algorithm\id3tree.h">
+    <ClInclude Include="..\..\Data_set\Dataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

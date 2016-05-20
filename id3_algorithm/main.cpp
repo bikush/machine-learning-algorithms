@@ -12,7 +12,7 @@ int main() {
 	string class_name = "Play";  // type
 	string name = "Day";/**/
 
-	string file_name = "data/zoo.txt";
+	string file_name = "../data/zoo.txt";
 	string class_name = "type";  // type
 	string name = "object";
 /**/
