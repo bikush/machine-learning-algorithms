@@ -15,21 +15,35 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\main.cpp">
+    <ClCompile Include="..\..\id3_algorithm\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Neuralnetwork.cpp">
+    <ClCompile Include="..\..\id3_algorithm\id3tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Neuron.cpp">
+    <ClCompile Include="..\..\id3_algorithm\id3_algorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\id3_algorithm\Dataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Neuralnetwork.h">
+    <Text Include="..\data\tennis.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\data\zoo.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\id3_algorithm\Dataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Neuron.h">
+    <ClInclude Include="..\..\id3_algorithm\id3_algorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\id3_algorithm\id3tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

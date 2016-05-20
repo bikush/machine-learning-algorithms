@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "id3_algorithm", "id3_algorithm.vcxproj", "{FB7337F1-89CA-4E58-95EF-BBEA337CF3B0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "id3_algorithm", "id3_algorithm\id3_algorithm.vcxproj", "{FB7337F1-89CA-4E58-95EF-BBEA337CF3B0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Neural_network", "..\..\Neural_network\VS\Neural_network.vcxproj", "{9B9DD251-D146-47E4-B1F6-C8F5800253FF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Neural_network", "Nerual_network\Neural_network.vcxproj", "{9B9DD251-D146-47E4-B1F6-C8F5800253FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

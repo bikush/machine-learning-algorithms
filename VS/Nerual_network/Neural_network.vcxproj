@@ -18,10 +18,19 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Neural_network\main.cpp" />
+    <ClCompile Include="..\..\Neural_network\Neuralnetwork.cpp" />
+    <ClCompile Include="..\..\Neural_network\Neuron.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Neural_network\Neuralnetwork.h" />
+    <ClInclude Include="..\..\Neural_network\Neuron.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{FB7337F1-89CA-4E58-95EF-BBEA337CF3B0}</ProjectGuid>
+    <ProjectGuid>{9B9DD251-D146-47E4-B1F6-C8F5800253FF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>id3_algorithm</RootNamespace>
+    <RootNamespace>Neural_network</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -79,7 +88,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\;$(IncludePath)</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)..\</IncludePath>
     <SourcePath>$(VC_SourcePath);$(ProjectDir)..\</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -149,21 +158,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\Dataset.cpp" />
-    <ClCompile Include="..\id3tree.cpp" />
-    <ClCompile Include="..\id3_algorithm.cpp" />
-    <ClCompile Include="..\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\Dataset.h" />
-    <ClInclude Include="..\id3tree.h" />
-    <ClInclude Include="..\id3_algorithm.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\data\tennis.txt" />
-    <Text Include="..\data\zoo.txt" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

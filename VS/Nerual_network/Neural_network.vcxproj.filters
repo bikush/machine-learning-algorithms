@@ -15,36 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Dataset.cpp">
+    <ClCompile Include="..\..\Neural_network\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\id3_algorithm.cpp">
+    <ClCompile Include="..\..\Neural_network\Neuralnetwork.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\id3tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main.cpp">
+    <ClCompile Include="..\..\Neural_network\Neuron.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Dataset.h">
+    <ClInclude Include="..\..\Neural_network\Neuralnetwork.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\id3_algorithm.h">
+    <ClInclude Include="..\..\Neural_network\Neuron.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\id3tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\data\tennis.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="..\data\zoo.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>

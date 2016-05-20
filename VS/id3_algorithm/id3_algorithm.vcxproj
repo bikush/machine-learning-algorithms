@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9B9DD251-D146-47E4-B1F6-C8F5800253FF}</ProjectGuid>
+    <ProjectGuid>{FB7337F1-89CA-4E58-95EF-BBEA337CF3B0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Neural_network</RootNamespace>
+    <RootNamespace>id3_algorithm</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,16 +71,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)..\</IncludePath>
-    <SourcePath>$(VC_SourcePath);$(ProjectDir)..\</SourcePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <SourcePath>$(VC_SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)..\</IncludePath>
-    <SourcePath>$(VC_SourcePath);$(ProjectDir)..\</SourcePath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <SourcePath>$(VC_SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -150,13 +150,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="..\Neuralnetwork.cpp" />
-    <ClCompile Include="..\Neuron.cpp" />
+    <ClCompile Include="..\..\id3_algorithm\Dataset.cpp" />
+    <ClCompile Include="..\..\id3_algorithm\id3tree.cpp" />
+    <ClCompile Include="..\..\id3_algorithm\id3_algorithm.cpp" />
+    <ClCompile Include="..\..\id3_algorithm\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Neuralnetwork.h" />
-    <ClInclude Include="..\Neuron.h" />
+    <Text Include="..\data\tennis.txt" />
+    <Text Include="..\data\zoo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\id3_algorithm\Dataset.h" />
+    <ClInclude Include="..\..\id3_algorithm\id3tree.h" />
+    <ClInclude Include="..\..\id3_algorithm\id3_algorithm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
