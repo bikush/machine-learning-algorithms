@@ -18,38 +18,19 @@ void generate_sin(vector<double> & values, vector<double> & res) {
 	}
 }
 
-int main () {
-	/* xor example:*/
-	/*
-	vector<int> init{2, 3, 1};
-	vector<vector<double>> inputs(2);
-	vector<vector<double>> outputs(1);
-	inputs[0] = vector<double>{ 0, 0, 1, 1};
-	inputs[1] = vector<double>{ 0, 1, 0, 1};
-	outputs[0] = vector<double>{0, 1, 1, 0};
-	Neural_network nn{init, 0.1};
-	nn(inputs, outputs, 10000);
-
-	Neural_network::test(nn, vector<double>{1, 1}, vector<double>{0});
-	Neural_network::test(nn, vector<double>{1., 0}, vector<double>{1});
-	Neural_network::test(nn, vector<double>{0, 1.}, vector<double>{1});
-	Neural_network::test(nn, vector<double>{0, 0}, vector<double>{0});
-	/**/
-
-	/*sine example:*/
-
-	vector<int> init{1, 3, 1};
+void sine_example( int iterations = 1000) {
+	vector<int> init{ 1, 3, 1 };
 	vector<vector<double>> inputs(1);
 	vector<vector<double>> outputs(1);
-	Neural_network nn{init, 0.6};
+	Neural_network nn{ init, 0.6 };
 
 	inputs[0] = vector<double>(50);
 	outputs[0] = vector<double>(50);
 	generate_sin(inputs[0], outputs[0]);
-	transform_values(inputs[0], 0.0, 1/(M_PI*2.0));
+	transform_values(inputs[0], 0.0, 1 / (M_PI*2.0));
 	transform_values(outputs[0], 0.5, 0.5);
 
-	nn(inputs, outputs, 100000);
+	nn(inputs, outputs, iterations);
 
 	vector<vector<double>> t_inputs(1);
 	vector<vector<double>> t_outputs(1);
@@ -73,6 +54,31 @@ int main () {
 	cout << "min error: " << min_error << endl;
 	cout << "max error: " << max_error << endl;
 	cout << "avg span: " << (max_error - min_error) / 2.0 << endl;
+}
+
+void xor_example( int iterations = 1000 ) {
+	vector<int> init{ 2, 3, 1 };
+	vector<vector<double>> inputs(2);
+	vector<vector<double>> outputs(1);
+	inputs[0] = vector<double>{ 0, 0, 1, 1 };
+	inputs[1] = vector<double>{ 0, 1, 0, 1 };
+	outputs[0] = vector<double>{ 0, 1, 1, 0 };
+	Neural_network nn{ init, 0.1 };
+	nn(inputs, outputs, iterations);
+
+	Neural_network::test(nn, vector<double>{1, 1}, vector<double>{0});
+	Neural_network::test(nn, vector<double>{1., 0}, vector<double>{1});
+	Neural_network::test(nn, vector<double>{0, 1.}, vector<double>{1});
+	Neural_network::test(nn, vector<double>{0, 0}, vector<double>{0});
+}
+
+int main () {
+	/* xor example:*/
+	//xor_example(100000);
+
+	/*sine example:*/
+	sine_example(10000);
+	
 
 	return 0;
 }
