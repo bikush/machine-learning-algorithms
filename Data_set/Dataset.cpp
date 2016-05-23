@@ -22,10 +22,10 @@ void Data::print(){
 
 const size_t Attribute_set::get_number_of_inputs() const
 {
-	size_t number = attr_map.size();
-	for (auto item : attr_used) {
-		if (!item) {
-			number--;
+	size_t number = 0;
+	for (auto item : attr_usage) {
+		if (item == Attribute::Attribute_usage::input) {
+			number++;
 		}
 	}
 	return number;
@@ -101,7 +101,15 @@ void Data_set::load_simple_db(const std::string & path, const std::string & clas
 					string attr_val;
 					string attr_type;
 					while (is >> attr_val && is >> attr_type) {
-						Attribute new_attr{ attr_val, attr_type, !(attr_type == "name" || attr_val == class_name) };
+						// TODO: fix this special case
+						Attribute::Attribute_usage attr_usage = Attribute::Attribute_usage::input;
+						if (attr_type == "name") {
+							attr_usage = Attribute::Attribute_usage::none;
+						}
+						else if (attr_val == class_name) {
+							attr_usage = Attribute::Attribute_usage::output;
+						}
+						Attribute new_attr{ attr_val, attr_type, attr_usage };
 						attr.append_attr(new_attr);
 					}
 				}

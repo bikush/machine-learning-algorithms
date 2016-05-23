@@ -26,20 +26,26 @@ private:
 };
 
 struct Attribute{
+	enum Attribute_usage {
+		none = 0,
+		input = 1,
+		output = 2
+	};
 	std::string name;
 	std::string type;
-	bool used;
+	Attribute_usage usage;
 };
 
 class Attribute_set {
 public:
 	Attribute_set() {}
 	const std::vector<std::string> & get_all_attributes() const {return attr_names;}
-	std::vector<std::string> get_filtered_attributes() const;
+	std::vector<std::string> get_attributes_of_kind(Attribute::Attribute_usage usage) const;
+
 	void append_attr(const Attribute & attr) {
 		attr_names.push_back(attr.name);
 		attr_types.push_back(attr.type);
-		attr_used.push_back(attr.used);
+		attr_usage.push_back(attr.usage);
 	}
 	std::map<std::string, std::set<std::string>> & get_attr_map() {return attr_map;}
 	const std::set<std::string> & get_attr_values(const std::string & attr) const;
@@ -48,8 +54,7 @@ private:
 	std::map<std::string, std::set<std::string>> attr_map;
 	std::vector<std::string> attr_names;
 	std::vector<std::string> attr_types;
-	std::vector<bool> attr_used;
-
+	std::vector<Attribute::Attribute_usage> attr_usage;
 };
 
 class Data_set {
@@ -83,5 +88,5 @@ private:
 	std::string label_name;
 	std::vector<Data> data_set;
 };
-
+	
 #endif /* DATASET_H_ */
