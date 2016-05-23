@@ -1,4 +1,5 @@
 #include "id3_algorithm.h"
+#include "Dataset.h"
 #include <iostream>
 using namespace std;
 
