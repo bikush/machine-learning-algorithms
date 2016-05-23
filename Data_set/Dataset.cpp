@@ -14,6 +14,22 @@
 
 using namespace std;
 
+void Data::print(){
+	for (auto a : attributes) {
+		cout << a << ": " << values_map[a] << endl;
+	}
+}
+
+const size_t Attribute_set::get_number_of_inputs() const
+{
+	size_t number = attr_map.size();
+	for (auto item : attr_used) {
+		if (!item) {
+			number--;
+		}
+	}
+	return number;
+}
 
 istream & operator>>(istream & is, Data & d) {
 	for (const auto & attr : d.attributes) {
@@ -125,6 +141,57 @@ void Data_set::distribute_random(Data_set & first, Data_set & second, double per
 void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold)
 {
 	// TODO: split date into fold_count parts, place take_fold-th fold into second, place rest into first
+}
+
+void Data_set::normalized_data(std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
+{
+	// TODO: this is a complex problem that needs more thought
+	int size = get_size();
+	inputs.reserve(size);
+	outputs.reserve(size);
+
+	// TODO: move to Attribute_set class
+	// TODO: add support for multiple outputs
+	auto attr_inputs = attr.get_filtered_attributes();
+	auto found_class_itr = find(attr_inputs.begin(), attr_inputs.end(), label_name);
+	if (found_class_itr != attr_inputs.end()) {
+		attr_inputs.erase(found_class_itr);
+	}
+
+	vector<double> transformed_data( attr_inputs.size() );
+	vector<double> transformed_output(1);
+
+	// TODO: move to Attribute_set
+	// TODO: figure out what to do with numerical values
+	map<string, map<string, double>> transform;
+	auto attr_names = attr.get_all_attributes();
+	for (auto attribute : attr_names) {
+		auto values = attr.get_attr_values(attribute);
+		map<string, double> attribute_transform;
+		double transform_value = 0.0;
+		double increment = 1.0 / (values.size()-1);
+		for (string value : values) {
+			attribute_transform[value] = transform_value;
+			transform_value += increment;
+		}
+		transform[attribute] = attribute_transform;
+	}
+
+	
+	for (auto data : data_set)
+	{
+		// TODO: data transform into a function
+		transformed_data.clear();
+		for (auto attribute : attr_inputs) {
+			transformed_data.push_back(transform[attribute][data.get_value(attribute)]);
+		}
+		// TODO: an array of outputs/labels is needed
+		transformed_output.clear();
+		transformed_output.push_back(transform[label_name][data.get_value(label_name)]);
+		
+		inputs.push_back(transformed_data);
+		outputs.push_back(transformed_output);
+	}
 }
 
 vector<int> Data_set::split_by_attr_val(const vector<int> & subset, const string & att, const string & val) const {

@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include <iostream>
 #include <algorithm>
+#include "Dataset.h"
 #include "Neuralnetwork.h"
 using namespace std;
 
@@ -72,13 +73,46 @@ void xor_example( int iterations = 1000 ) {
 	Neural_network::test(nn, vector<double>{0, 0}, vector<double>{0});
 }
 
+void load_dataset() {
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";  // type
+	string name = "Day";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	auto all_attr = ds.attr.get_all_attributes();
+	for (auto attr : all_attr) {
+		cout << attr << ": ";
+		auto att_vals = ds.attr.get_attr_values(attr);
+		for (auto val : att_vals) {
+			cout << val << ", ";
+		}
+		cout << "increment: " << 1.0 / (att_vals.size() - 1) << endl;
+	}
+	cout << endl;
+
+	vector<vector<double>> inputs, outputs;
+	ds.normalized_data(inputs,outputs);
+
+	for (int i = 0; i < inputs.size(); i++) {
+		Data data = ds.get_elem(i);
+		data.print();
+		auto& elem = inputs[i];
+		for (auto val : elem) {
+			cout << val << ", ";
+		}
+		cout << " class: " << outputs[i][0] << endl << "--------------------------------------" << endl;
+	}
+}
+
 int main () {
 	/* xor example:*/
 	//xor_example(100000);
 
 	/*sine example:*/
-	sine_example(10000);
+	//sine_example(1000);
 	
+	load_dataset();
 
 	return 0;
 }

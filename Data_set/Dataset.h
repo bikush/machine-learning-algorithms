@@ -18,8 +18,10 @@ public:
 	const std::vector<std::string> attributes;
 	const std::string & get_value(const std::string & att) const { return values_map.at(att);}
 	void set_value(const std::string & att, const std::string & val) {values_map[att] = val;}
+	void print();
+
 	//bool has_attribute(const std::string & att) { auto it = attr_map.find(att); return it != attr_map.end();}
-public:
+private:
 	std::map<std::string, std::string> values_map;
 };
 
@@ -41,11 +43,13 @@ public:
 	}
 	std::map<std::string, std::set<std::string>> & get_attr_map() {return attr_map;}
 	const std::set<std::string> & get_attr_values(const std::string & attr) const;
+	const size_t get_number_of_inputs() const;
 private:
 	std::map<std::string, std::set<std::string>> attr_map;
 	std::vector<std::string> attr_names;
 	std::vector<std::string> attr_types;
 	std::vector<bool> attr_used;
+
 };
 
 class Data_set {
@@ -70,6 +74,9 @@ public:
 	// * * * * * * * *
 	// f_c = 4, t_f = 1
 	// f f|s s|f f|f f
+
+	void normalized_data( std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs ) const;
+
 private:
 	void define_attr_values(const Data & d);
 	void clear();
