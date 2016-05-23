@@ -9,6 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "id3_algorithm", "id3_algori
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Neural_network", "Nerual_network\Neural_network.vcxproj", "{9B9DD251-D146-47E4-B1F6-C8F5800253FF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5499950B-9816-4013-B925-B4F035CC8243} = {5499950B-9816-4013-B925-B4F035CC8243}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Data_set", "Data_set\Data_set.vcxproj", "{5499950B-9816-4013-B925-B4F035CC8243}"
 EndProject
