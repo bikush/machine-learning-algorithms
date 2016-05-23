@@ -6,7 +6,9 @@
  */
 
 #include "Neuralnetwork.h"
+#include "Dataset.h"
 #include <chrono>
+
 using namespace std;
 
 Neural_network::Neural_network(const vector<int> & init, double learning_rate, double acceptable_error):
@@ -204,4 +206,14 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 	cout << "calc " << calculation << "s (" << 100.0 * calculation / total_duration.count() << "%)" << endl;
 	cout << "back " << backpropagation << "s (" << 100.0 *  backpropagation / total_duration.count() << "%)" << endl;
 
+}
+
+
+void Neural_network::operator()(const Data_set & data, int epoch_count)
+{
+	vector<vector<double>> inputs;
+	vector<vector<double>> outputs;
+
+	data.normalized_data(inputs, outputs);
+	this->operator()(inputs, outputs, epoch_count);
 }
