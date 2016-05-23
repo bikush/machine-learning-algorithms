@@ -74,6 +74,7 @@ void Data_set::load_simple_db(const std::string & path)
 	load_simple_db(path, label_name);
 }
 
+// TODO: use some other format for db
 void Data_set::load_simple_db(const std::string & path, const std::string & class_name){
 	ifstream ifs{ path };
 	if (!ifs) {
@@ -123,6 +124,7 @@ void Data_set::load_simple_db(const std::string & path, const std::string & clas
 		}
 
 	}
+	attr.generate_normalizer();
 }
 
 void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage){
@@ -151,53 +153,56 @@ void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_cou
 	// TODO: split date into fold_count parts, place take_fold-th fold into second, place rest into first
 }
 
+void Attribute_normalizer::add_attribute(const std::string & attr_name, const std::set<std::string> & values)
+{
+	map<string, double> attribute_transform;
+	double transform_value = 0.0;
+	double increment = 1.0 / (values.size() - 1);
+	for (string value : values) {
+		attribute_transform[value] = transform_value;
+		transform_value += increment;
+	}
+	transform[attr_name] = attribute_transform;
+}
+
+void Attribute_normalizer::normalize(const Data & data, const std::vector<std::string>& attributes, std::vector<double>& output)
+{
+	output.clear();
+	for (auto attribute : attributes) {
+		output.push_back(transform[attribute][data.get_value(attribute)]);
+	}
+}
+
+
+void Attribute_set::generate_normalizer() {
+	normalizer.reset();
+	// TODO: figure out what to do with numerical values
+	
+	for (auto attribute : attr_names) {
+		normalizer.add_attribute(attribute, get_attr_values(attribute));
+	}
+}
+
 void Data_set::normalized_data(std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
 {
-	// TODO: this is a complex problem that needs more thought
+	// TODO: this is a complex problem that needs more thought, or?
 	int size = get_size();
 	inputs.reserve(size);
 	outputs.reserve(size);
 
-	// TODO: move to Attribute_set class
-	// TODO: add support for multiple outputs
-	auto attr_inputs = attr.get_filtered_attributes();
-	auto found_class_itr = find(attr_inputs.begin(), attr_inputs.end(), label_name);
-	if (found_class_itr != attr_inputs.end()) {
-		attr_inputs.erase(found_class_itr);
-	}
-
-	vector<double> transformed_data( attr_inputs.size() );
-	vector<double> transformed_output(1);
-
-	// TODO: move to Attribute_set
-	// TODO: figure out what to do with numerical values
-	map<string, map<string, double>> transform;
-	auto attr_names = attr.get_all_attributes();
-	for (auto attribute : attr_names) {
-		auto values = attr.get_attr_values(attribute);
-		map<string, double> attribute_transform;
-		double transform_value = 0.0;
-		double increment = 1.0 / (values.size()-1);
-		for (string value : values) {
-			attribute_transform[value] = transform_value;
-			transform_value += increment;
-		}
-		transform[attribute] = attribute_transform;
-	}
-
+	auto attr_inputs = attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
+	auto attr_outputs = attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
 	
+	vector<double> transformed_data(attr_inputs.size());
+	vector<double> transformed_output(attr_outputs.size());
+
+	auto normalizer = attr.get_normalizer();
 	for (auto data : data_set)
 	{
-		// TODO: data transform into a function
-		transformed_data.clear();
-		for (auto attribute : attr_inputs) {
-			transformed_data.push_back(transform[attribute][data.get_value(attribute)]);
-		}
-		// TODO: an array of outputs/labels is needed
-		transformed_output.clear();
-		transformed_output.push_back(transform[label_name][data.get_value(label_name)]);
-		
+		normalizer.normalize(data, attr_inputs, transformed_data);
 		inputs.push_back(transformed_data);
+
+		normalizer.normalize(data, attr_outputs, transformed_output);
 		outputs.push_back(transformed_output);
 	}
 }
@@ -233,11 +238,13 @@ void Data_set::clear()
 	attr = Attribute_set{};
 }
 
-vector<string> Attribute_set::get_filtered_attributes() const {
+vector<string> Attribute_set::get_attributes_of_kind(Attribute::Attribute_usage usage) const
+{
 	vector<string> res;
 	for (size_t i=0; i<attr_names.size(); i++) {
-		if (attr_used[i])
+		if (attr_usage[i] == usage) {
 			res.push_back(attr_names[i]);
+		}
 	}
 	return res;
 }

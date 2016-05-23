@@ -36,6 +36,15 @@ struct Attribute{
 	Attribute_usage usage;
 };
 
+class Attribute_normalizer {
+public:
+	void add_attribute( const std::string & attr_name, const std::set<std::string> & values);
+	void normalize(const Data & data, const std::vector<std::string> & attributes, std::vector<double>& output);
+	void reset() { transform.clear(); };
+private:
+	std::map<std::string, std::map<std::string, double>> transform;
+};
+
 class Attribute_set {
 public:
 	Attribute_set() {}
@@ -50,11 +59,15 @@ public:
 	std::map<std::string, std::set<std::string>> & get_attr_map() {return attr_map;}
 	const std::set<std::string> & get_attr_values(const std::string & attr) const;
 	const size_t get_number_of_inputs() const;
+	const Attribute_normalizer& get_normalizer() const { return normalizer; };
+	void generate_normalizer();
+
 private:
 	std::map<std::string, std::set<std::string>> attr_map;
 	std::vector<std::string> attr_names;
 	std::vector<std::string> attr_types;
 	std::vector<Attribute::Attribute_usage> attr_usage;
+	Attribute_normalizer normalizer;
 };
 
 class Data_set {
@@ -81,12 +94,12 @@ public:
 	// f f|s s|f f|f f
 
 	void normalized_data( std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs ) const;
-
+	
 private:
 	void define_attr_values(const Data & d);
 	void clear();
 	std::string label_name;
 	std::vector<Data> data_set;
 };
-	
+
 #endif /* DATASET_H_ */
