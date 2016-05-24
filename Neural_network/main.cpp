@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include <iostream>
 #include <algorithm>
+#include "Dataset.h"
 #include "Neuralnetwork.h"
 using namespace std;
 
@@ -18,38 +19,19 @@ void generate_sin(vector<double> & values, vector<double> & res) {
 	}
 }
 
-int main () {
-	/* xor example:*/
-	/*
-	vector<int> init{2, 3, 1};
-	vector<vector<double>> inputs(2);
-	vector<vector<double>> outputs(1);
-	inputs[0] = vector<double>{ 0, 0, 1, 1};
-	inputs[1] = vector<double>{ 0, 1, 0, 1};
-	outputs[0] = vector<double>{0, 1, 1, 0};
-	Neural_network nn{init, 0.1};
-	nn(inputs, outputs, 10000);
-
-	Neural_network::test(nn, vector<double>{1, 1}, vector<double>{0});
-	Neural_network::test(nn, vector<double>{1., 0}, vector<double>{1});
-	Neural_network::test(nn, vector<double>{0, 1.}, vector<double>{1});
-	Neural_network::test(nn, vector<double>{0, 0}, vector<double>{0});
-	/**/
-
-	/*sine example:*/
-
-	vector<int> init{1, 3, 1};
+void sine_example( int iterations = 1000) {
+	vector<int> init{ 1, 3, 1 };
 	vector<vector<double>> inputs(1);
 	vector<vector<double>> outputs(1);
-	Neural_network nn{init, 0.6};
+	Neural_network nn{ init, 0.6 };
 
 	inputs[0] = vector<double>(50);
 	outputs[0] = vector<double>(50);
 	generate_sin(inputs[0], outputs[0]);
-	transform_values(inputs[0], 0.0, 1/(M_PI*2.0));
+	transform_values(inputs[0], 0.0, 1 / (M_PI*2.0));
 	transform_values(outputs[0], 0.5, 0.5);
 
-	nn(inputs, outputs, 100000);
+	nn(inputs, outputs, iterations);
 
 	vector<vector<double>> t_inputs(1);
 	vector<vector<double>> t_outputs(1);
@@ -73,6 +55,70 @@ int main () {
 	cout << "min error: " << min_error << endl;
 	cout << "max error: " << max_error << endl;
 	cout << "avg span: " << (max_error - min_error) / 2.0 << endl;
+}
+
+void xor_example( int iterations = 1000 ) {
+	vector<int> init{ 2, 3, 1 };
+	vector<vector<double>> inputs(2);
+	vector<vector<double>> outputs(1);
+	inputs[0] = vector<double>{ 0, 0, 1, 1 };
+	inputs[1] = vector<double>{ 0, 1, 0, 1 };
+	outputs[0] = vector<double>{ 0, 1, 1, 0 };
+	Neural_network nn{ init, 0.1 };
+	nn(inputs, outputs, iterations);
+
+	Neural_network::test(nn, vector<double>{1, 1}, vector<double>{0});
+	Neural_network::test(nn, vector<double>{1., 0}, vector<double>{1});
+	Neural_network::test(nn, vector<double>{0, 1.}, vector<double>{1});
+	Neural_network::test(nn, vector<double>{0, 0}, vector<double>{0});
+}
+
+void tennis_example( int iterations = 1000 ) {
+	//Data_set::_test_normalize_columns();
+
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set train, test;
+	ds.distribute_split(train, test, 0.8);
+
+	vector<int> init{ train.attr.count_attr_by_usage( Attribute::Attribute_usage::input ), 3, 1 };
+	Neural_network nn{ init, 0.1 };
+	nn(train, iterations);
+
+	Neural_network::test(nn, test);	
+}
+
+void zoo_example(int iterations = 1000) {
+	//Data_set::_test_normalize_columns();
+
+	string file_name = "../data/zoo.txt";
+	string class_name = "type";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set train, test;
+	ds.distribute_split(train, test, 0.8);
+
+	vector<int> init{ train.attr.count_attr_by_usage(Attribute::Attribute_usage::input), 5, 1 };
+	Neural_network nn{ init, 0.21 };
+	nn(train, iterations);
+
+	Neural_network::test(nn, test);
+}
+
+int main () {
+	/* xor example:*/
+	//xor_example(100000);
+
+	/*sine example:*/
+	//sine_example(1000);
+	
+	//tennis_example( 1000 );
+
+	zoo_example(1000);
 
 	return 0;
 }

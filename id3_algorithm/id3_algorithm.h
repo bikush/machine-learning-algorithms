@@ -1,10 +1,11 @@
 #ifndef ID3ALGORITH_H_
 #define ID3ALGORITH_H_
 
-#include "Dataset.h"
 #include "id3tree.h"
 #include <algorithm>
 #include <vector>
+
+class Data_set;
 
 class id3_algorithm{
 public:

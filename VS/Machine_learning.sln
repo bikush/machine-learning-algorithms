@@ -4,8 +4,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "id3_algorithm", "id3_algorithm\id3_algorithm.vcxproj", "{FB7337F1-89CA-4E58-95EF-BBEA337CF3B0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5499950B-9816-4013-B925-B4F035CC8243} = {5499950B-9816-4013-B925-B4F035CC8243}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Neural_network", "Nerual_network\Neural_network.vcxproj", "{9B9DD251-D146-47E4-B1F6-C8F5800253FF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5499950B-9816-4013-B925-B4F035CC8243} = {5499950B-9816-4013-B925-B4F035CC8243}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Data_set", "Data_set\Data_set.vcxproj", "{5499950B-9816-4013-B925-B4F035CC8243}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +39,14 @@ Global
 		{9B9DD251-D146-47E4-B1F6-C8F5800253FF}.Release|x64.Build.0 = Release|x64
 		{9B9DD251-D146-47E4-B1F6-C8F5800253FF}.Release|x86.ActiveCfg = Release|Win32
 		{9B9DD251-D146-47E4-B1F6-C8F5800253FF}.Release|x86.Build.0 = Release|Win32
+		{5499950B-9816-4013-B925-B4F035CC8243}.Debug|x64.ActiveCfg = Debug|x64
+		{5499950B-9816-4013-B925-B4F035CC8243}.Debug|x64.Build.0 = Debug|x64
+		{5499950B-9816-4013-B925-B4F035CC8243}.Debug|x86.ActiveCfg = Debug|Win32
+		{5499950B-9816-4013-B925-B4F035CC8243}.Debug|x86.Build.0 = Debug|Win32
+		{5499950B-9816-4013-B925-B4F035CC8243}.Release|x64.ActiveCfg = Release|x64
+		{5499950B-9816-4013-B925-B4F035CC8243}.Release|x64.Build.0 = Release|x64
+		{5499950B-9816-4013-B925-B4F035CC8243}.Release|x86.ActiveCfg = Release|Win32
+		{5499950B-9816-4013-B925-B4F035CC8243}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
