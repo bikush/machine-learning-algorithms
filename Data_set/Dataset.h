@@ -60,7 +60,7 @@ public:
 	}
 	std::map<std::string, std::set<std::string>> & get_attr_map() {return attr_map;}
 	const std::set<std::string> & get_attr_values(const std::string & attr) const;
-	const size_t get_number_of_inputs() const;
+	const int count_attr_by_usage(Attribute::Attribute_usage usage) const;
 	const Attribute_normalizer& get_normalizer() const { return normalizer; };
 	void generate_normalizer();
 

@@ -20,11 +20,11 @@ void Data::print(){
 	}
 }
 
-const size_t Attribute_set::get_number_of_inputs() const
+const int Attribute_set::count_attr_by_usage( Attribute::Attribute_usage usage ) const
 {
 	size_t number = 0;
 	for (auto item : attr_usage) {
-		if (item == Attribute::Attribute_usage::input) {
+		if (item == usage) {
 			number++;
 		}
 	}
