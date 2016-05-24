@@ -74,44 +74,7 @@ void xor_example( int iterations = 1000 ) {
 }
 
 void load_dataset() {
-	string file_name = "../data/tennis.txt";
-	string class_name = "Play";  // type
-	string name = "Day";
-	Data_set ds;
-	ds.load_simple_db(file_name, class_name);
-
-	auto all_attr = ds.attr.get_all_attributes();
-	for (auto attr : all_attr) {
-		cout << attr << ": ";
-		auto att_vals = ds.attr.get_attr_values(attr);
-		for (auto val : att_vals) {
-			cout << val << ", ";
-		}
-		cout << "increment: " << 1.0 / (att_vals.size() - 1) << endl;
-	}
-	cout << endl;
-
-	vector<vector<double>> inputs, outputs;
-	ds.normalized_data(inputs,outputs);
-	auto input_attrs = ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
-	for (int i = 0; i < inputs.size(); i++) {
-		Data data = ds.get_elem(i);
-		data.print();
-		auto& elem = inputs[i];
-		for (auto val : elem) {
-			cout << val << ", ";
-		}
-		cout << " class: " << outputs[i][0] << endl << "--------------------------------------" << endl;
-
-		elem[0] = abs( elem[0] - 0.2 );
-		auto norm = ds.attr.get_normalizer();
-		auto undo = norm.undo_normalize(input_attrs, elem);
-		int undo_idx = 0;
-		for (auto u_item : undo) {
-			cout << input_attrs[undo_idx] << ": " << u_item.second << ", error: " << u_item.first << endl;
-			undo_idx++;
-		}
-	}
+	Data_set::_test_normalize();
 
 }
 

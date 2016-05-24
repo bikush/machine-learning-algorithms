@@ -178,7 +178,7 @@ vector<pair<double, string>> Attribute_normalizer::undo_normalize(const vector<s
 {
 	vector<pair<double, string>> output;
 
-	for (int i = 0; i < attributes.size(); i++) {
+	for (unsigned int i = 0; i < attributes.size(); i++) {
 		string attr_name = attributes[i];
 		double value = values[i];
 
@@ -261,6 +261,48 @@ void Data_set::clear()
 	label_name = "";
 	data_set.clear();
 	attr = Attribute_set{};
+}
+
+void Data_set::_test_normalize()
+{
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";  // type
+	string name = "Day";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	auto all_attr = ds.attr.get_all_attributes();
+	for (auto attr : all_attr) {
+		cout << attr << ": ";
+		auto att_vals = ds.attr.get_attr_values(attr);
+		for (auto val : att_vals) {
+			cout << val << ", ";
+		}
+		cout << "increment: " << 1.0 / (att_vals.size() - 1) << endl;
+	}
+	cout << endl;
+
+	vector<vector<double>> inputs, outputs;
+	ds.normalized_data(inputs, outputs);
+	auto input_attrs = ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
+	for (unsigned int i = 0; i < inputs.size(); i++) {
+		Data data = ds.get_elem(i);
+		data.print();
+		auto& elem = inputs[i];
+		for (auto val : elem) {
+			cout << val << ", ";
+		}
+		cout << " class: " << outputs[i][0] << endl << "--------------------------------------" << endl;
+
+		elem[0] = abs(elem[0] - 0.2);
+		auto norm = ds.attr.get_normalizer();
+		auto undo = norm.undo_normalize(input_attrs, elem);
+		int undo_idx = 0;
+		for (auto u_item : undo) {
+			cout << input_attrs[undo_idx] << ": " << u_item.second << ", error: " << u_item.first << endl;
+			undo_idx++;
+		}
+	}
 }
 
 vector<string> Attribute_set::get_attributes_of_kind(Attribute::Attribute_usage usage) const

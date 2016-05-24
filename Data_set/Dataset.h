@@ -96,6 +96,8 @@ public:
 	// f f|s s|f f|f f
 
 	void normalized_data( std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs ) const;
+
+	static void _test_normalize();
 	
 private:
 	void define_attr_values(const Data & d);
