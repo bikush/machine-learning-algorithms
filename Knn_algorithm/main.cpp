@@ -10,23 +10,17 @@ double distance_func(const vector<double> & x1, const vector<double> & x2) {
 }
 
 int main () {
-    vector<vector<double>> inputs;
-    vector<vector<double>> outputs;
-    /*example: y = x1 + x2 */
-    vector<double> x1;
-    vector<double> x2;
-    vector<double> y;
-    int num_samples = 100;
+	int num_samples = 100;
+    vector<vector<double>> inputs(num_samples*num_samples, vector<double>(2));
+    vector<vector<double>> outputs(num_samples*num_samples, vector<double>(1));
+    /*example: y = x1^2 + x2*/
     for (int i=0; i<num_samples; i++) {
-    	for (int j=0; j<num_samples; j++) {
-			x1.push_back(i*0.2);
-			x2.push_back(j*0.2);
-			y.push_back(i*i*0.2*0.2 + j*0.2);
+    	for (int j=0; j < num_samples; j++) {
+    		inputs[i*num_samples+j][0] = i*0.2;
+			inputs[i*num_samples+j][1] = j*0.2;
+			outputs[i*num_samples+j][0] = i*i*0.2*0.2 + j*0.2;
     	}
     }
-    inputs.push_back(x1);
-    inputs.push_back(x2);
-    outputs.push_back(y);
     Knn_algorithm knn{inputs, outputs, 1, &distance_func};
     vector<double>  res = knn(vector<double>{2.1, 3.1});
     cout << "res should be " << 2.1*2.1+3.1 <<", alg returned: " << res[0];
