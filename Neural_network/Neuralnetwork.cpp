@@ -153,6 +153,8 @@ double Neural_network::test(Neural_network & nn, const Data_set & test_set)
 
 	int test_size = test_set.get_size();
 	double total_error = 0.0;
+	double misslabel_error = 0.0;
+	int misslabel_count = 0;
 	for (int test_idx = 0; test_idx < test_size; test_idx++) {
 		vector<double> res = nn.calculate(inputs[test_idx]);
 		vector<double> target = outputs[test_idx];
@@ -162,6 +164,11 @@ double Neural_network::test(Neural_network & nn, const Data_set & test_set)
 
 		double coumpound_error = 0.0;
 		for (size_t i = 0; i<res.size(); i++) {
+			if (res_labels[i].second != target_labels[i].second) {
+				misslabel_count++;
+				misslabel_error += res_labels[i].first;
+			}
+
 			cout << "output[" << i << "] = " << res[i] << " (" << res_labels[i].second << "," << res_labels[i].first << ")" << endl;
 			cout << "expected output: " << target[i] << " (" << target_labels[i].second << ")" << endl;
 			coumpound_error += abs(target[i] - res[i]);
@@ -171,7 +178,10 @@ double Neural_network::test(Neural_network & nn, const Data_set & test_set)
 	}
 	total_error /= test_size;
 	cout << "Total error: " << total_error << endl;
-	return total_error;
+	cout << "Misslabel count: " << misslabel_count << " (" << double(misslabel_count)/test_size << ")" << endl;
+	cout << "Only misslabel error: " << misslabel_error / test_size << endl;
+	
+	return double(misslabel_count) / test_size;
 }
 
 vector<double> Neural_network::calculate(const vector<double> & inputs){

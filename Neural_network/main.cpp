@@ -91,6 +91,24 @@ void tennis_example( int iterations = 1000 ) {
 	Neural_network::test(nn, test);	
 }
 
+void zoo_example(int iterations = 1000) {
+	//Data_set::_test_normalize_columns();
+
+	string file_name = "../data/zoo.txt";
+	string class_name = "type";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set train, test;
+	ds.distribute_split(train, test, 0.8);
+
+	vector<int> init{ train.attr.count_attr_by_usage(Attribute::Attribute_usage::input), 5, 1 };
+	Neural_network nn{ init, 0.21 };
+	nn(train, iterations);
+
+	Neural_network::test(nn, test);
+}
+
 int main () {
 	/* xor example:*/
 	//xor_example(100000);
@@ -98,7 +116,9 @@ int main () {
 	/*sine example:*/
 	//sine_example(1000);
 	
-	tennis_example( 10 );
+	//tennis_example( 1000 );
+
+	zoo_example(1000);
 
 	return 0;
 }
