@@ -93,7 +93,7 @@ void load_dataset() {
 
 	vector<vector<double>> inputs, outputs;
 	ds.normalized_data(inputs,outputs);
-
+	auto input_attrs = ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
 	for (int i = 0; i < inputs.size(); i++) {
 		Data data = ds.get_elem(i);
 		data.print();
@@ -102,7 +102,17 @@ void load_dataset() {
 			cout << val << ", ";
 		}
 		cout << " class: " << outputs[i][0] << endl << "--------------------------------------" << endl;
+
+		elem[0] = abs( elem[0] - 0.2 );
+		auto norm = ds.attr.get_normalizer();
+		auto undo = norm.undo_normalize(input_attrs, elem);
+		int undo_idx = 0;
+		for (auto u_item : undo) {
+			cout << input_attrs[undo_idx] << ": " << u_item.second << ", error: " << u_item.first << endl;
+			undo_idx++;
+		}
 	}
+
 }
 
 int main () {

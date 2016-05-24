@@ -163,6 +163,7 @@ void Attribute_normalizer::add_attribute(const std::string & attr_name, const st
 		transform_value += increment;
 	}
 	transform[attr_name] = attribute_transform;
+	span[attr_name] = increment;
 }
 
 void Attribute_normalizer::normalize(const Data & data, const std::vector<std::string>& attributes, std::vector<double>& output)
@@ -173,6 +174,30 @@ void Attribute_normalizer::normalize(const Data & data, const std::vector<std::s
 	}
 }
 
+vector<pair<double, string>> Attribute_normalizer::undo_normalize(const vector<string>& attributes, const vector<double>& values)
+{
+	vector<pair<double, string>> output;
+
+	for (int i = 0; i < attributes.size(); i++) {
+		string attr_name = attributes[i];
+		double value = values[i];
+
+		auto attr_trans = transform[attr_name];
+		double best_fit = attr_trans.begin()->second;
+		string best_name = attr_trans.begin()->first;
+		for (auto trans_pair : attr_trans) {
+			if (abs(trans_pair.second - value) < abs(best_fit - value)) {
+				best_fit = trans_pair.second;
+				best_name = trans_pair.first;
+			}
+		}
+
+		double accuracy = abs(best_fit - value) / span[attr_name];
+		output.push_back({ accuracy, best_name });
+	}
+
+	return output;
+}
 
 void Attribute_set::generate_normalizer() {
 	normalizer.reset();

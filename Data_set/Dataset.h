@@ -40,9 +40,11 @@ class Attribute_normalizer {
 public:
 	void add_attribute( const std::string & attr_name, const std::set<std::string> & values);
 	void normalize(const Data & data, const std::vector<std::string> & attributes, std::vector<double>& output);
+	std::vector<std::pair<double,std::string>> undo_normalize(const std::vector<std::string> & attributes, const std::vector<double> & value);
 	void reset() { transform.clear(); };
 private:
 	std::map<std::string, std::map<std::string, double>> transform;
+	std::map<std::string, double> span;
 };
 
 class Attribute_set {
