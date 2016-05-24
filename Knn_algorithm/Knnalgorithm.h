@@ -14,11 +14,13 @@
 #include <iostream>
 #include <stdexcept>
 
+typedef double(*distance_function)(const std::vector<double> &, const std::vector<double> &);
+
 class Knn_algorithm {
 public:
 	Knn_algorithm(const std::vector<std::vector<double>> & in,
 				  const std::vector<std::vector<double>> & out,
-				  int nn, double (*d)(const std::vector<double> &, const std::vector<double> &),
+				  int nn, distance_function d,
 				  bool v=false)
 		:inputs{in}, outputs{out}, k{nn}, distance_func{d}, vote{v}{}
 	std::vector<double> operator()(const std::vector<double> & query_point);
@@ -27,7 +29,7 @@ private:
 	const std::vector<std::vector<double>> inputs;
 	const std::vector<std::vector<double>> outputs;
 	int k;
-	double (*distance_func)(const std::vector<double> &, const std::vector<double> &);
+	distance_function distance_func;
 	bool vote;
 	std::vector<std::pair<double, int>> calculate_distances(const std::vector<double> & query_point);
 	std::vector<double> get_average(const std::vector<std::pair<double, int>> & knn);
