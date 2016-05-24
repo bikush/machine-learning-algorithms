@@ -73,8 +73,8 @@ void xor_example( int iterations = 1000 ) {
 	Neural_network::test(nn, vector<double>{0, 0}, vector<double>{0});
 }
 
-void load_dataset() {
-	Data_set::_test_normalize();
+void tennis_example( int iterations = 1000 ) {
+	//Data_set::_test_normalize_columns();
 
 }
 
@@ -85,7 +85,7 @@ int main () {
 	/*sine example:*/
 	//sine_example(1000);
 	
-	load_dataset();
+	tennis_example( 10 );
 
 	return 0;
 }

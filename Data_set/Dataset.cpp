@@ -208,6 +208,8 @@ void Attribute_set::generate_normalizer() {
 	}
 }
 
+
+// TODO: a lot of c/p code, fix this
 void Data_set::normalized_data(std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
 {
 	// TODO: this is a complex problem that needs more thought, or?
@@ -229,6 +231,30 @@ void Data_set::normalized_data(std::vector<std::vector<double>>& inputs, std::ve
 
 		normalizer.normalize(data, attr_outputs, transformed_output);
 		outputs.push_back(transformed_output);
+	}
+}
+
+// TODO: a lot of c/p code, fix this
+void Data_set::normalized_data_columns(std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
+{
+	vector<vector<double>> row_inputs, row_outputs;
+	normalized_data(row_inputs, row_outputs);
+
+	int attr_input_size = attr.count_attr_by_usage(Attribute::Attribute_usage::input);
+	int attr_output_size = attr.count_attr_by_usage(Attribute::Attribute_usage::output);
+
+	int size = get_size();
+	for (int input_idx = 0; input_idx < attr_input_size; input_idx++) {
+		inputs.push_back(vector<double>(size));
+		for (int data_idx = 0; data_idx < size; data_idx++) {
+			inputs[input_idx][data_idx] = row_inputs[data_idx][input_idx];
+		}
+	}
+	for (int output_idx = 0; output_idx < attr_output_size; output_idx++) {
+		outputs.push_back(vector<double>(size));
+		for (int data_idx = 0; data_idx < size; data_idx++) {
+			outputs[output_idx][data_idx] = row_outputs[data_idx][output_idx];
+		}
 	}
 }
 
@@ -302,6 +328,63 @@ void Data_set::_test_normalize()
 			cout << input_attrs[undo_idx] << ": " << u_item.second << ", error: " << u_item.first << endl;
 			undo_idx++;
 		}
+
+		cout << endl << endl;
+	}
+}
+
+void Data_set::_test_normalize_columns()
+{
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";  // type
+	string name = "Day";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	auto all_attr = ds.attr.get_all_attributes();
+	for (auto attr : all_attr) {
+		cout << attr << ": ";
+		auto att_vals = ds.attr.get_attr_values(attr);
+		for (auto val : att_vals) {
+			cout << val << ", ";
+		}
+		cout << "increment: " << 1.0 / (att_vals.size() - 1) << endl;
+	}
+	cout << endl;
+
+	vector<vector<double>> inputs, outputs;
+	ds.normalized_data_columns(inputs, outputs);
+
+	/*cout << "COUNT " << ds.get_size() << endl;
+	cout << "COLUMNS " << inputs.size() << endl;
+	cout << "COLUMN SIZE " << inputs[0].size() << endl;
+	for (int i = 0; i < inputs.size(); i++) {
+		for (int j = 0; j < inputs[i].size(); j++) {
+			cout << inputs[i][j] << " ";
+		}
+		cout << endl;
+	}*/
+
+	auto input_attrs = ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
+	for (unsigned int i = 0; i < ds.get_size(); i++) {
+		Data data = ds.get_elem(i);
+		data.print();
+		vector<double> row;
+		for (int attr_idx = 0; attr_idx < inputs.size(); attr_idx++) {
+			cout << inputs[attr_idx][i] << ", ";
+			row.push_back(inputs[attr_idx][i]);
+		}
+		cout << " class: " << outputs[0][i] << endl << "--------------------------------------" << endl;
+
+		inputs[0][i] = abs(inputs[0][i] - 0.2);
+		auto norm = ds.attr.get_normalizer();
+		auto undo = norm.undo_normalize(input_attrs, row);
+		int undo_idx = 0;
+		for (auto u_item : undo) {
+			cout << input_attrs[undo_idx] << ": " << u_item.second << ", error: " << u_item.first << endl;
+			undo_idx++;
+		}
+		cout << endl << endl;
 	}
 }
 
