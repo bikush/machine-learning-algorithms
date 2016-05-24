@@ -62,7 +62,7 @@ id3_node id3_algorithm::operator()() {
 	for (int i=0; i< ds.get_size(); i++) {
 		subset.push_back(i);
 	}
-	return calculate(subset, ds.attr.get_filtered_attributes());
+	return calculate(subset, ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input));
 }
 
 

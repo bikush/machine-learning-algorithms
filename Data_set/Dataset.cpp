@@ -366,11 +366,11 @@ void Data_set::_test_normalize_columns()
 	}*/
 
 	auto input_attrs = ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
-	for (unsigned int i = 0; i < ds.get_size(); i++) {
+	for (int i = 0; i < ds.get_size(); i++) {
 		Data data = ds.get_elem(i);
 		data.print();
 		vector<double> row;
-		for (int attr_idx = 0; attr_idx < inputs.size(); attr_idx++) {
+		for (unsigned int attr_idx = 0; attr_idx < inputs.size(); attr_idx++) {
 			cout << inputs[attr_idx][i] << ", ";
 			row.push_back(inputs[attr_idx][i]);
 		}
