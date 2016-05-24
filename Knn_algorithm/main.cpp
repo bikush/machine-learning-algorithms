@@ -21,15 +21,15 @@ int main () {
     	for (int j=0; j<num_samples; j++) {
 			x1.push_back(i*0.2);
 			x2.push_back(j*0.2);
-			y.push_back(i*0.2 * j*0.2);
+			y.push_back(i*i*0.2*0.2 + j*0.2);
     	}
     }
     inputs.push_back(x1);
     inputs.push_back(x2);
     outputs.push_back(y);
-    Knn_algorithm knn{inputs, outputs, 5, &distance_func};
-    vector<double>  res = knn(vector<double>{2.1, 3.2});
-    cout << "res should be " << 2.1*3.2 <<", alg returned: " << res[0];
+    Knn_algorithm knn{inputs, outputs, 1, &distance_func};
+    vector<double>  res = knn(vector<double>{2.1, 3.1});
+    cout << "res should be " << 2.1*2.1+3.1 <<", alg returned: " << res[0];
 	return 0;
 }
 
