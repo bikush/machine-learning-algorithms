@@ -142,6 +142,38 @@ double Neural_network::test(Neural_network & nn, const vector<double> & inputs, 
 	cout << endl;
 	return coumpound_error / res.size();
 }
+
+double Neural_network::test(Neural_network & nn, const Data_set & test_set)
+{
+	vector<vector<double>> inputs;
+	vector<vector<double>> outputs;
+	test_set.normalized_data(inputs, outputs);
+	auto normalizer = test_set.attr.get_normalizer();
+	auto attr_outputs = test_set.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
+
+	int test_size = test_set.get_size();
+	double total_error = 0.0;
+	for (int test_idx = 0; test_idx < test_size; test_idx++) {
+		vector<double> res = nn.calculate(inputs[test_idx]);
+		vector<double> target = outputs[test_idx];
+
+		auto res_labels = normalizer.undo_normalize(attr_outputs, res);
+		auto target_labels = normalizer.undo_normalize(attr_outputs, target);
+
+		double coumpound_error = 0.0;
+		for (size_t i = 0; i<res.size(); i++) {
+			cout << "output[" << i << "] = " << res[i] << " (" << res_labels[i].second << "," << res_labels[i].first << ")" << endl;
+			cout << "expected output: " << target[i] << " (" << target_labels[i].second << ")" << endl;
+			coumpound_error += abs(target[i] - res[i]);
+			cout << "ERROR = " << abs(target[i] - res[i]) << endl;
+		}
+		total_error += coumpound_error / res.size();
+	}
+	total_error /= test_size;
+	cout << "Total error: " << total_error << endl;
+	return total_error;
+}
+
 vector<double> Neural_network::calculate(const vector<double> & inputs){
 	vector<double> out(neurons_per_layer[num_layers-1]);
 	for (size_t i=0; i < inputs.size(); i++) {
@@ -214,6 +246,6 @@ void Neural_network::operator()(const Data_set & data, int epoch_count)
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
 
-	data.normalized_data(inputs, outputs);
+	data.normalized_data_columns(inputs, outputs);
 	this->operator()(inputs, outputs, epoch_count);
 }

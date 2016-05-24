@@ -25,6 +25,7 @@ public:
 	double get_learning_rate(){return eta;}
 	void set_learning_rate(double lr) {eta = lr;}
 	static double test(Neural_network & nn, const std::vector<double> & inputs, const std::vector<double> & targets);
+	static double test(Neural_network & nn, const Data_set & test_set);
 	std::vector<double> calculate(const std::vector<double> & inputs);
 private:
 	double eta;

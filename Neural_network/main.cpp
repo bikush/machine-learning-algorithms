@@ -76,6 +76,19 @@ void xor_example( int iterations = 1000 ) {
 void tennis_example( int iterations = 1000 ) {
 	//Data_set::_test_normalize_columns();
 
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set train, test;
+	ds.distribute_split(train, test, 0.8);
+
+	vector<int> init{ train.attr.count_attr_by_usage( Attribute::Attribute_usage::input ), 3, 1 };
+	Neural_network nn{ init, 0.1 };
+	nn(train, iterations);
+
+	Neural_network::test(nn, test);	
 }
 
 int main () {
