@@ -14,6 +14,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <assert.h>
+#include "Dataset.h"
 
 typedef double(*distance_function)(const std::vector<double> &, const std::vector<double> &);
 
@@ -22,11 +23,13 @@ public:
 	Knn_algorithm(const std::vector<std::vector<double>> & in,
 		      const std::vector<std::vector<double>> & out,
 		      int nn, distance_function d, bool v=false);
+	Knn_algorithm(const Data_set & data, int nn, distance_function d, bool v=false);
+	void test(const Data_set & test);
 	std::vector<double> operator()(const std::vector<double> & query_point);
 	static constexpr double tolerance=1e-10;
 private:
-	const std::vector<std::vector<double>> inputs;
-	const std::vector<std::vector<double>> outputs;
+	std::vector<std::vector<double>> inputs;
+	std::vector<std::vector<double>> outputs;
 	int k;
 	distance_function distance_func;
 	bool vote;

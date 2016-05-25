@@ -18,6 +18,46 @@ Knn_algorithm::Knn_algorithm(const std::vector<std::vector<double>> & in,
 	assert(in_s > 0);
 	assert(in_s > nn);
 }
+
+//const Data_set & data
+
+Knn_algorithm::Knn_algorithm(const Data_set & data, int nn, distance_function d, bool v)
+	:k{nn}, distance_func{d}, vote{v}{
+	data.normalized_data(inputs, outputs);
+	int in_s = inputs.size();
+	int out_s = outputs.size();
+	assert(in_s == out_s);
+	assert(in_s > 0);
+	assert(in_s > nn);
+}
+
+void Knn_algorithm::test(const Data_set & test) {
+	vector<vector<double>> in;
+	vector<vector<double>> out;
+	int miss_labeled = 0;
+	int total = 0;
+	auto normalizer = test.attr.get_normalizer();
+	auto attr_outputs = test.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
+	test.normalized_data(in, out);
+	int in_s = in.size();
+	int out_s = out.size();
+	assert(in_s == out_s);
+	assert(in_s > 0);
+	for (size_t i=0; i<in.size(); i++) {
+		vector<double> res = (*this)(in[i]);
+		vector<double> target = out[i];
+		auto res_labels = normalizer.undo_normalize(attr_outputs, res);
+		auto target_labels = normalizer.undo_normalize(attr_outputs, target);
+		for (size_t j=0; j < out[0].size(); j++) {
+			if (res_labels[j].second != target_labels[j].second) {
+				miss_labeled++;
+			}
+			total++;
+		}
+	}
+	cout << "Miss labeled: " << miss_labeled << " total: " <<  total << endl;
+	cout << "Error: " << double(miss_labeled)/in.size()*100.0 << "%."<< endl;
+}
 struct sort_distances {
 	bool operator() (pair<double, int> left, pair<double, int> right) const {
 		return left.first < right.first;
@@ -53,7 +93,7 @@ vector<double> Knn_algorithm::get_average(const vector<pair<double, int>> & knn)
 	}
 	for (size_t i=0; i<res.size(); i++) {
 		res[i] = res[i]/n[i];
-		cout << ((n[i] == k) ? "k and n are the same ": "n is: ") << n[i] << ", k is: " << k << endl;
+		//cout << ((n[i] == k) ? "k and n are the same ": "n is: ") << n[i] << ", k is: " << k << endl;
 	}
 	return res;
 }
