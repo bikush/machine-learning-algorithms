@@ -197,17 +197,13 @@ vector<double> Neural_network::calculate(const vector<double> & inputs){
 }
 
 void Neural_network::operator() (const vector<vector<double>> & inputs, const vector<vector<double>> & outputs, int epoch_count){
-	size_t data_size = inputs[0].size();
-	for (size_t i=0; i< inputs.size(); i++) {
-		assert(data_size == inputs[i].size());
-	}
-	for (size_t i=0; i< outputs.size(); i++) {
-		assert(data_size == outputs[i].size());
-	}
-	assert(inputs.size() == neurons_at_layer[0].size()-1);
-	assert(outputs.size() == neurons_at_layer[num_layers-1].size());
+	size_t data_size = inputs.size();
+	assert (data_size > 0);
+	assert(data_size == outputs.size());
+	assert(inputs[0].size() == neurons_at_layer[0].size()-1);
+	assert(outputs[0].size() == neurons_at_layer[num_layers-1].size());
 
-	vector <double> targets(outputs.size()); // target outputs
+	vector <double> targets(outputs[0].size()); // target outputs
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> start, end, total_start;
 	double calculation = 0.0;
@@ -218,12 +214,12 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 		//cout << epoch_count << endl;
 		for (size_t current=0; current < data_size; current++) {			
 			/*init inputs*/
-			for (size_t i=0; i < inputs.size(); i++) {
-				neurons_at_layer[0][i].set_out(inputs[i][current]);
+			for (size_t i=0; i < inputs[0].size(); i++) {
+				neurons_at_layer[0][i].set_out(inputs[current][i]);
 			}
 			/*init target*/
-			for (size_t i=0; i < outputs.size(); i++) {
-				targets[i] = outputs[i][current];
+			for (size_t i=0; i < outputs[i].size(); i++) {
+				targets[i] = outputs[current][i];
 			}
 
 			start = std::chrono::high_resolution_clock::now();
@@ -256,6 +252,6 @@ void Neural_network::operator()(const Data_set & data, int epoch_count)
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
 
-	data.normalized_data_columns(inputs, outputs);
+	data.normalized_data(inputs, outputs);
 	this->operator()(inputs, outputs, epoch_count);
 }
