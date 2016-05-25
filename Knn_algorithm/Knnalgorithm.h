@@ -13,16 +13,15 @@
 #include <algorithm>
 #include <iostream>
 #include <stdexcept>
+#include <assert.h>
 
 typedef double(*distance_function)(const std::vector<double> &, const std::vector<double> &);
 
 class Knn_algorithm {
 public:
 	Knn_algorithm(const std::vector<std::vector<double>> & in,
-				  const std::vector<std::vector<double>> & out,
-				  int nn, distance_function d,
-				  bool v=false)
-		:inputs{in}, outputs{out}, k{nn}, distance_func{d}, vote{v}{}
+		      const std::vector<std::vector<double>> & out,
+		      int nn, distance_function d, bool v=false);
 	std::vector<double> operator()(const std::vector<double> & query_point);
 	static constexpr double tolerance=1e-10;
 private:

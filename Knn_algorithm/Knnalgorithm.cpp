@@ -8,6 +8,16 @@
 #include "Knnalgorithm.h"
 using namespace  std;
 
+Knn_algorithm::Knn_algorithm(const std::vector<std::vector<double>> & in,
+							 const std::vector<std::vector<double>> & out,
+							 int nn, double (*d)(const std::vector<double> &, const std::vector<double> &),
+							 bool v):inputs{in}, outputs{out}, k{nn}, distance_func{d}, vote{v}{
+	int in_s = in.size();
+	int out_s = out.size();
+	assert(in_s == out_s);
+	assert(in_s > 0);
+	assert(in_s > nn);
+}
 struct sort_distances {
 	bool operator() (pair<double, int> left, pair<double, int> right) const {
 		return left.first < right.first;
