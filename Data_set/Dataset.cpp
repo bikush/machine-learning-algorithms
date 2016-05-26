@@ -151,8 +151,8 @@ void Data_set::distribute_split(Data_set & first, Data_set & second, double perc
 	}
 	if (random) {
 		//auto clock = std::chrono::high_resolution_clock{};
-		default_random_engine generator{ (unsigned int)chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count() };
-		shuffle(indice.begin(), indice.end(), generator);
+		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+		shuffle(indice.begin(), indice.end(), default_random_engine{ seed });
 	}
 
 	fill_subset(first, std::vector<int>(indice.begin(), indice.begin() + first_size));
