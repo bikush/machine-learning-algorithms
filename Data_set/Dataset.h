@@ -88,7 +88,7 @@ public:
 	const std::string & get_label_name() const {return label_name; }
 	Attribute_set attr;
 
-	void subset(Data_set & subset, const std::vector<int> & subset_indice);
+	void fill_subset(Data_set & subset, const std::vector<int> & subset_indice);
 	void distribute_split(Data_set & first, Data_set & second, double percentage, bool random = false);
 	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold);
 	// * * * * * * * *
