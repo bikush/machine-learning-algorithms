@@ -22,7 +22,7 @@ int main() {
 	
 	Data_set train;
 	Data_set test;
-	ds.distribute_split(train, test, 0.65);
+	ds.distribute_split(train, test, 0.65, true);
 
 	cout << "data length: " << ds.get_size() << endl;
 	id3_algorithm id3{ train };

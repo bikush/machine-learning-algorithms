@@ -11,12 +11,14 @@
 #include <fstream>
 #include <sstream>
 #include <functional>
+#include <random>
+#include <chrono>
 
 using namespace std;
 
-void Data::print(){
+void Data::print() const{
 	for (auto a : attributes) {
-		cout << a << ": " << values_map[a] << endl;
+		cout << a << ": " << values_map.at(a) << endl;
 	}
 }
 
@@ -127,25 +129,34 @@ void Data_set::load_simple_db(const std::string & path, const std::string & clas
 	attr.generate_normalizer();
 }
 
-void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage){
-	percentage = std::min(1.0, std::max(0.0, percentage));
-	first.attr = attr;
-	first.label_name = label_name;
-	second.attr = attr;
-	second.label_name = label_name;
-	int total_size = get_size();
-	int first_size = int(percentage * total_size);
-	for (int i = 0; i < first_size; i++) {
-		first.data_set.push_back(data_set[i]);
+void Data_set::fill_subset(Data_set & subset, const std::vector<int>& subset_indice)
+{
+	subset.attr = attr;
+	subset.label_name = label_name;
+	subset.data_set.clear();
+	subset.data_set.reserve(subset_indice.size());
+	for (auto index : subset_indice) {
+		subset.data_set.push_back(data_set[index]);
 	}
-	for (int i = first_size; i < total_size; i++) {
-		second.data_set.push_back(data_set[i]);
-	}	
 }
 
-void Data_set::distribute_random(Data_set & first, Data_set & second, double percentage)
-{
-	// TODO: randomly select a percentage of elements into first and (1-percentage) into second
+void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage, bool random){
+	percentage = std::min(1.0, std::max(0.0, percentage));
+	int total_size = get_size();
+	int first_size = int(percentage * total_size);
+
+	std::vector<int> indice(total_size);
+	for (int i = 0; i < total_size; i++) {
+		indice[i] = i;
+	}
+	if (random) {
+		//auto clock = std::chrono::high_resolution_clock{};
+		default_random_engine generator{ (unsigned int)chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count() };
+		shuffle(indice.begin(), indice.end(), generator);
+	}
+
+	fill_subset(first, std::vector<int>(indice.begin(), indice.begin() + first_size));
+	fill_subset(second, std::vector<int>(indice.begin()+first_size, indice.end()));
 }
 
 void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold)

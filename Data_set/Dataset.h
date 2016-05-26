@@ -18,7 +18,7 @@ public:
 	const std::vector<std::string> attributes;
 	const std::string & get_value(const std::string & att) const { return values_map.at(att);}
 	void set_value(const std::string & att, const std::string & val) {values_map[att] = val;}
-	void print();
+	void print() const;
 
 	//bool has_attribute(const std::string & att) { auto it = attr_map.find(att); return it != attr_map.end();}
 private:
@@ -88,8 +88,8 @@ public:
 	const std::string & get_label_name() const {return label_name; }
 	Attribute_set attr;
 
-	void distribute_split(Data_set & first, Data_set & second, double percentage);
-	void distribute_random(Data_set & first, Data_set & second, double percentage);
+	void subset(Data_set & subset, const std::vector<int> & subset_indice);
+	void distribute_split(Data_set & first, Data_set & second, double percentage, bool random = false);
 	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold);
 	// * * * * * * * *
 	// f_c = 4, t_f = 1
