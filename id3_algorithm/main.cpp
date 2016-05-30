@@ -5,10 +5,31 @@
 
 using namespace std;
 
+void test_distribution() {
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set first;
+	Data_set second;
+
+	cout << "Total size: " << ds.get_size() << endl;
+	for (int i = 2; i <= ds.get_size() / 2; i++) {
+		cout << "Fold count " << i << endl;
+		for (int j = 0; j < i; j++) {
+			ds.distribute_fold(first, second, i, j);
+			cout << "    take " << j << ", taken " << first.get_size() << " and " << second.get_size() << endl;
+		}
+	}
+
+}
 
 int main() {
 
-/*	string file_name = "data/tennis.txt";
+	//test_distribution();
+	
+/*	string file_name = "../data/tennis.txt";
 	string class_name = "Play";  // type
 	string name = "Day";/**/
 

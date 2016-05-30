@@ -68,7 +68,7 @@ static inline string &trim(string &s) {
 // END TODO
 
 Data_set::Data_set(const std::string & l) :label_name{ l } {
-	std::cout << "Created data set " << l.c_str() << std::endl;
+	//std::cout << "Created data set " << l.c_str() << std::endl;
 }
 
 void Data_set::load_simple_db(const std::string & path)
@@ -159,9 +159,53 @@ void Data_set::distribute_split(Data_set & first, Data_set & second, double perc
 	fill_subset(second, std::vector<int>(indice.begin()+first_size, indice.end()));
 }
 
+//
+// @param fold_count: number of folds the data will be split into.
+// @param take_fold: fold index that will be inserted into the second data set. Starts from 0.
+//
 void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold)
 {
-	// TODO: split date into fold_count parts, place take_fold-th fold into second, place rest into first
+	// Examples of folds
+	// * * * * * * * * 8
+	// * * *|* * *|* * (3)
+	//-----------------------
+	// * * * * * * * * * 9
+	// * * *|* *|* *|* * (4)
+	//---------------------------------
+	// * * * * * * * * * * * * * * 14
+	// * * *|* * *|* * *|* * *|* * (5)
+
+	
+	int total_size = get_size();
+	fold_count = max(2, min(fold_count, total_size));
+	take_fold = max(0, min(take_fold, fold_count - 1));
+	int min_fold_size = total_size/fold_count;	// size of the smallest fold
+	int overflow = total_size - min_fold_size * fold_count;	// number of leftover elements
+	
+	// if the fold to take is within the overflow, the size increases
+	int main_fold_size = min_fold_size + ((take_fold < overflow) ? 1 : 0);
+	// fold start index
+	int fold_start = take_fold * min_fold_size + max(0, min(take_fold, overflow - 1));
+	// fold end index
+	int fold_end = fold_start + main_fold_size - 1;
+	
+	std::vector<int> indice(total_size - main_fold_size);
+	std::vector<int> indice_fold(main_fold_size);
+	int non_fold_idx = 0;
+	int fold_idx = 0;
+	for (int i = 0; i < total_size; i++) {
+		if (i >= fold_start && i <= fold_end) {
+			indice_fold[fold_idx] = i;
+			fold_idx++;
+		}
+		else {
+			indice[non_fold_idx] = i;
+			non_fold_idx++;
+		}
+	}
+	
+	fill_subset(first, indice);
+	fill_subset(second, indice_fold);
 }
 
 void Attribute_normalizer::add_attribute(const std::string & attr_name, const std::set<std::string> & values)
