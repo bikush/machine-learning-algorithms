@@ -88,18 +88,18 @@ public:
 	const std::string & get_label_name() const {return label_name; }
 	Attribute_set attr;
 
+	void shuffle_data();
+
 	void fill_subset(Data_set & subset, const std::vector<int> & subset_indice);
 	void distribute_split(Data_set & first, Data_set & second, double percentage, bool random = false);
 	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold);
-	// * * * * * * * *
-	// f_c = 4, t_f = 1
-	// f f|s s|f f|f f
-
+	
 	void normalized_data( std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs ) const;
 	void normalized_data_columns(std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
 
 	static void _test_normalize();
 	static void _test_normalize_columns();
+	static void _test_distribute_fold();
 	
 private:
 	void define_attr_values(const Data & d);

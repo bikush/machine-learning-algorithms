@@ -129,6 +129,12 @@ void Data_set::load_simple_db(const std::string & path, const std::string & clas
 	attr.generate_normalizer();
 }
 
+void Data_set::shuffle_data()
+{
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	shuffle(data_set.begin(), data_set.end(), default_random_engine{ seed });
+}
+
 void Data_set::fill_subset(Data_set & subset, const std::vector<int>& subset_indice)
 {
 	subset.attr = attr;
@@ -440,6 +446,26 @@ void Data_set::_test_normalize_columns()
 			undo_idx++;
 		}
 		cout << endl << endl;
+	}
+}
+
+void Data_set::_test_distribute_fold()
+{
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set first;
+	Data_set second;
+
+	cout << "Total size: " << ds.get_size() << endl;
+	for (int i = 2; i <= ds.get_size() / 2; i++) {
+		cout << "Fold count " << i << endl;
+		for (int j = 0; j < i; j++) {
+			ds.distribute_fold(first, second, i, j);
+			cout << "    take " << j << ", taken " << first.get_size() << " and " << second.get_size() << endl;
+		}
 	}
 }
 
