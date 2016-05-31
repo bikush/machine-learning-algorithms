@@ -6,6 +6,8 @@
  */
 
 #include "Knnalgorithm.h"
+#include "Dataset.h"
+
 using namespace  std;
 
 Knn_algorithm::Knn_algorithm(const std::vector<std::vector<double>> & in,

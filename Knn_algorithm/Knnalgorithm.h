@@ -14,9 +14,10 @@
 #include <iostream>
 #include <stdexcept>
 #include <assert.h>
-#include "Dataset.h"
 
 typedef double(*distance_function)(const std::vector<double> &, const std::vector<double> &);
+
+class Data_set;
 
 class Knn_algorithm {
 public:

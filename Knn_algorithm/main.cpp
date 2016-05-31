@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <math.h>
 #include "Knnalgorithm.h"
+#include "Dataset.h"
+
 using namespace std;
 
 double distance_func(const vector<double> & x1, const vector<double> & x2) {
