@@ -135,7 +135,7 @@ void Data_set::shuffle_data()
 	shuffle(data_set.begin(), data_set.end(), default_random_engine{ seed });
 }
 
-void Data_set::fill_subset(Data_set & subset, const std::vector<int>& subset_indice)
+void Data_set::fill_subset(Data_set & subset, const std::vector<int>& subset_indice) const
 {
 	subset.attr = attr;
 	subset.label_name = label_name;
@@ -146,7 +146,7 @@ void Data_set::fill_subset(Data_set & subset, const std::vector<int>& subset_ind
 	}
 }
 
-void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage, bool random){
+void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage, bool random) const{
 	percentage = std::min(1.0, std::max(0.0, percentage));
 	int total_size = get_size();
 	int first_size = int(percentage * total_size);
@@ -169,7 +169,7 @@ void Data_set::distribute_split(Data_set & first, Data_set & second, double perc
 // @param fold_count: number of folds the data will be split into.
 // @param take_fold: fold index that will be inserted into the second data set. Starts from 0.
 //
-void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold)
+void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold) const
 {
 	// Examples of folds
 	// * * * * * * * * 8

@@ -15,7 +15,7 @@
 class Data {
 public:
 	Data(const std::vector<std::string>& atts): attributes{atts}{}
-	const std::vector<std::string> attributes;
+	
 	const std::string & get_value(const std::string & att) const { return values_map.at(att);}
 	void set_value(const std::string & att, const std::string & val) {values_map[att] = val;}
 	void print() const;
@@ -23,6 +23,9 @@ public:
 	//bool has_attribute(const std::string & att) { auto it = attr_map.find(att); return it != attr_map.end();}
 private:
 	std::map<std::string, std::string> values_map;
+	std::vector<std::string> attributes;
+
+	friend std::istream & operator>>(std::istream & is, Data & d);
 };
 
 struct Attribute{
@@ -90,9 +93,9 @@ public:
 
 	void shuffle_data();
 
-	void fill_subset(Data_set & subset, const std::vector<int> & subset_indice);
-	void distribute_split(Data_set & first, Data_set & second, double percentage, bool random = false);
-	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold);
+	void fill_subset(Data_set & subset, const std::vector<int> & subset_indice) const;
+	void distribute_split(Data_set & first, Data_set & second, double percentage, bool random = false) const;
+	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold) const;
 	
 	void normalized_data( std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs ) const;
 	void normalized_data_columns(std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
