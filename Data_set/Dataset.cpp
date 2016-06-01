@@ -267,10 +267,12 @@ void Data_set::distribute_boosting(Data_set & new_ds, vector<pair<int, double>> 
 		new_ds.data_set.push_back(data_set[d.first]);
 	}
 	new_ds.set_init_weights(); /*
-	in this case wight init values will be incorrect
-	since uniform distrib is used, but since this weights
-	are not used in boosting alg, we do not care.
-	Better solution would be if init distrib would be correct!
+	in this case weight initial values will be incorrect
+	since uniform distribution is used by default.
+	Since this weights are not used in boosting algorithm,
+	we do not care.
+	Better solution would be if initial dataset distribution
+	was calculated correctly!
 	*/
 
 }
