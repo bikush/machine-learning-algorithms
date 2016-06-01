@@ -18,9 +18,15 @@
     <ClCompile Include="..\..\Data_set\Dataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Data_set\Cross_validation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Data_set\Dataset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Data_set\Cross_validation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

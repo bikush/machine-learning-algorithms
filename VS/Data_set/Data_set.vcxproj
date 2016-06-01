@@ -146,9 +146,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Data_set\Cross_validation.cpp" />
     <ClCompile Include="..\..\Data_set\Dataset.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Data_set\Cross_validation.h" />
     <ClInclude Include="..\..\Data_set\Dataset.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
