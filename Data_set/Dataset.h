@@ -11,6 +11,8 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <assert.h>
+#include <math.h>
 
 class Data {
 public:
@@ -96,7 +98,9 @@ public:
 	void fill_subset(Data_set & subset, const std::vector<int> & subset_indice) const;
 	void distribute_split(Data_set & first, Data_set & second, double percentage, bool random = false) const;
 	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold) const;
-	
+	void distribute_boosting(Data_set & new_ds, std::vector<std::pair<int, double>> & new_weights);
+	std::vector<std::pair<int, double>> get_weights() const { return weights; }
+	void set_weights(const std::vector<std::pair<int, double>> & new_w) {weights = new_w;}
 	void normalized_data( std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs ) const;
 	void normalized_data_columns(std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
 
@@ -107,8 +111,10 @@ public:
 private:
 	void define_attr_values(const Data & d);
 	void clear();
+	void set_init_weights();
 	std::string label_name;
 	std::vector<Data> data_set;
+	std::vector<std::pair<int, double>> weights;
 };
 
 #endif /* DATASET_H_ */

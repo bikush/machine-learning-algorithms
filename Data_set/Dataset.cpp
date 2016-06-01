@@ -74,6 +74,16 @@ Data_set::Data_set(const std::string & l) :label_name{ l } {
 void Data_set::load_simple_db(const std::string & path)
 {
 	load_simple_db(path, label_name);
+	set_init_weights();
+}
+
+//TODO: fix this to calculate real distribution over data!
+void Data_set::set_init_weights(){
+	size_t len = data_set.size();
+	weights.reserve(len);
+	for (size_t i=0; i<len; i++) {
+		weights[i] = make_pair(i, 1./len);
+	}
 }
 
 // TODO: use some other format for db
@@ -144,6 +154,7 @@ void Data_set::fill_subset(Data_set & subset, const std::vector<int>& subset_ind
 	for (auto index : subset_indice) {
 		subset.data_set.push_back(data_set[index]);
 	}
+	subset.set_init_weights();
 }
 
 void Data_set::distribute_split(Data_set & first, Data_set & second, double percentage, bool random) const{
@@ -212,6 +223,56 @@ void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_cou
 	
 	fill_subset(first, indice);
 	fill_subset(second, indice_fold);
+}
+
+struct sort_weights {
+	bool operator() (pair<int, double> left, pair<int, double> right) const {
+		return left.second < right.second;
+	}
+};
+
+void Data_set::distribute_boosting(Data_set & new_ds, vector<pair<int, double>> & new_weights) {
+	/*
+	 * 1. sort new_weights
+	 * from weights, create new vector distribution <int index, int num_of_repetition>
+	 * fill new_ds from old by vector distribution
+	 * */
+	assert(new_weights.size() == data_set.size());
+
+	sort(new_weights.begin(), new_weights.end(), sort_weights{});
+	int len = get_size();
+	int new_len = 0;
+	vector<pair<int,int>> distribution{};
+	for (const auto & w: weights) {
+		int batch = round(w.second*len);
+		new_len += batch;
+		if (new_len > len) {
+			if ((new_len - batch) > 0) {
+				new_len = len;
+				batch = len - new_len + batch;
+				distribution.push_back(make_pair(w.first, batch));
+			}
+			break;
+		}
+		distribution.push_back(make_pair(w.first, batch));
+	}
+
+	new_ds.attr = attr;
+	new_ds.label_name = label_name;
+	new_ds.data_set.clear();
+	new_ds.data_set.reserve(new_len);
+
+	for (auto d : distribution) {
+		for (int i=0; i<d.second; i++)
+		new_ds.data_set.push_back(data_set[d.first]);
+	}
+	new_ds.set_init_weights(); /*
+	in this case wight init values will be incorrect
+	since uniform distrib is used, but since this weights
+	are not used in boosting alg, we do not care.
+	Better solution would be if init distrib would be correct!
+	*/
+
 }
 
 void Attribute_normalizer::add_attribute(const std::string & attr_name, const std::set<std::string> & values)
