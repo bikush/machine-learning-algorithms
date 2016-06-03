@@ -74,16 +74,38 @@ Data_set::Data_set(const std::string & l) :label_name{ l } {
 void Data_set::load_simple_db(const std::string & path)
 {
 	load_simple_db(path, label_name);
-	set_init_weights();
 }
+
+struct sort_weights {
+	bool operator() (pair<int, double> left, pair<int, double> right) const {
+		return left.second < right.second;
+	}
+};
 
 //TODO: fix this to calculate real distribution over data!
 void Data_set::set_init_weights(){
 	size_t len = data_set.size();
 	weights.reserve(len);
 	for (size_t i=0; i<len; i++) {
-		weights[i] = make_pair(i, 1./len);
+		weights.push_back(make_pair(i, 1./len));
 	}
+	//sort(weights.begin(), weights.end(), sort_weights{});
+}
+
+void Data_set::set_weights(const std::vector<std::pair<int, double>> & new_w){
+	weights = new_w;
+	sort(weights.begin(), weights.end(), sort_weights{});
+}
+
+struct find_index {
+	int index;
+	find_index(int idx): index{idx} {}
+	bool operator()(pair<int, double> elem) {return elem.first == index;}
+};
+double Data_set::get_weight(int idx) const {
+	auto it = find_if(weights.begin(), weights.end(), find_index{idx});
+	if (it == weights.end()) throw runtime_error("Unexisting weight.");
+	return (*it).second;
 }
 
 // TODO: use some other format for db
@@ -137,6 +159,7 @@ void Data_set::load_simple_db(const std::string & path, const std::string & clas
 
 	}
 	attr.generate_normalizer();
+	set_init_weights();
 }
 
 void Data_set::shuffle_data()
@@ -225,21 +248,11 @@ void Data_set::distribute_fold(Data_set & first, Data_set & second, int fold_cou
 	fill_subset(second, indice_fold);
 }
 
-struct sort_weights {
-	bool operator() (pair<int, double> left, pair<int, double> right) const {
-		return left.second < right.second;
-	}
-};
-
-void Data_set::distribute_boosting(Data_set & new_ds, vector<pair<int, double>> & new_weights) {
+void Data_set::distribute_boosting(Data_set & new_ds) {
 	/*
-	 * 1. sort new_weights
 	 * from weights, create new vector distribution <int index, int num_of_repetition>
 	 * fill new_ds from old by vector distribution
 	 * */
-	assert(new_weights.size() == data_set.size());
-
-	sort(new_weights.begin(), new_weights.end(), sort_weights{});
 	int len = get_size();
 	int new_len = 0;
 	vector<pair<int,int>> distribution{};
@@ -266,15 +279,7 @@ void Data_set::distribute_boosting(Data_set & new_ds, vector<pair<int, double>> 
 		for (int i=0; i<d.second; i++)
 		new_ds.data_set.push_back(data_set[d.first]);
 	}
-	new_ds.set_init_weights(); /*
-	in this case weight initial values will be incorrect
-	since uniform distribution is used by default.
-	Since this weights are not used in boosting algorithm,
-	we do not care.
-	Better solution would be if initial dataset distribution
-	was calculated correctly!
-	*/
-
+	new_ds.set_weights(weights);
 }
 
 void Attribute_normalizer::add_attribute(const std::string & attr_name, const std::set<std::string> & values)

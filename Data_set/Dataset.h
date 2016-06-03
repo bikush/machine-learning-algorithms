@@ -98,9 +98,10 @@ public:
 	void fill_subset(Data_set & subset, const std::vector<int> & subset_indice) const;
 	void distribute_split(Data_set & first, Data_set & second, double percentage, bool random = false) const;
 	void distribute_fold(Data_set & first, Data_set & second, int fold_count, int take_fold) const;
-	void distribute_boosting(Data_set & new_ds, std::vector<std::pair<int, double>> & new_weights);
+	void distribute_boosting(Data_set &);
 	std::vector<std::pair<int, double>> get_weights() const { return weights; }
-	void set_weights(const std::vector<std::pair<int, double>> & new_w) {weights = new_w;}
+	double get_weight(int idx) const;
+	void set_weights(const std::vector<std::pair<int, double>> & new_w);
 	void normalized_data( std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs ) const;
 	void normalized_data_columns(std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
 
