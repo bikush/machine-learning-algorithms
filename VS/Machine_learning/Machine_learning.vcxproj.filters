@@ -27,9 +27,6 @@
     <ClCompile Include="..\..\machine_learning\id3_algorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\machine_learning\id3tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\machine_learning\Knnalgorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,6 +40,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Machine_learning\Algorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\machine_learning\Decision_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,9 +59,6 @@
     <ClInclude Include="..\..\machine_learning\id3_algorithm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\machine_learning\id3tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\machine_learning\Knnalgorithm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Machine_learning\Algorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\machine_learning\Decision_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

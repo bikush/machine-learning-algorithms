@@ -56,7 +56,7 @@ string id3_algorithm::find_most_common_class(const vector<int> & subset) {
 	return common;
 }
 
-id3_node id3_algorithm::operator()() {
+Decision_node id3_algorithm::operator()() {
 	vector<int> subset;
 	subset.reserve(ds.get_size());
 	for (int i=0; i< ds.get_size(); i++) {
@@ -66,7 +66,7 @@ id3_node id3_algorithm::operator()() {
 }
 
 
-id3_node id3_algorithm::calculate(const vector<int> & subset, const vector<string> & attributes) {
+Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<string> & attributes) {
 	for (const auto & val: class_vals) {
 		bool all_the_same= true;
 		for (int i: subset) {
@@ -76,14 +76,14 @@ id3_node id3_algorithm::calculate(const vector<int> & subset, const vector<strin
 			}
 		}
 		if (all_the_same) {
-			return id3_node{class_name, set<string>{val}, true};
+			return Decision_node{class_name, set<string>{val}, true};
 		}
 	}
 
 
     // check if the are any more attributes:
 	if (attributes.size() == 0) {
-		return id3_node{class_name, set<string>{find_most_common_class(subset)}, true};
+		return Decision_node{class_name, set<string>{find_most_common_class(subset)}, true};
 	}
 
 	double min = calculate_gain(attributes[0], subset);
@@ -106,7 +106,7 @@ id3_node id3_algorithm::calculate(const vector<int> & subset, const vector<strin
 	}
 	// do the splitting
 	auto vals = ds.attr.get_attr_values(attribute);
-	id3_node new_node{attribute, vals};
+	Decision_node new_node{attribute, vals};
 	for (const auto & v : vals) {
 		vector<int> res = ds.split_by_attr_val(subset, attribute, v);
 
@@ -114,7 +114,7 @@ id3_node id3_algorithm::calculate(const vector<int> & subset, const vector<strin
 			new_node.add_a_child(v, calculate(res, attr));
 		} else {
 			// no val of this type found.
-			new_node.add_a_child(v, id3_node{class_name, set<string>{find_most_common_class(subset)}, true});
+			new_node.add_a_child(v, Decision_node{class_name, set<string>{find_most_common_class(subset)}, true});
 		}
 	}
 	return new_node;
@@ -137,14 +137,14 @@ void id3_test(string file_name, string class_name, string name) {
 	cout << "data length: " << ds.get_size() << endl;
 	id3_algorithm id3{ train };
 	cout << "train data length: " << train.get_size() << endl;
-	id3_node root = id3();
+	Decision_node root = id3();
 
 	root.print();
 
 	int count = 0;
 	for (int i = 0; i< test.get_size(); i++) {
 		Data d{ test.get_elem(i) };
-		string res = root.classify(d, class_name);
+		string res = root.classify(d);
 		if (d.get_value(class_name) == res) {
 			cout << d.get_value(name) << " is a " << res << endl;
 			count++;

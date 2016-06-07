@@ -150,7 +150,7 @@
     <ClCompile Include="..\..\machine_learning\Boosting.cpp" />
     <ClCompile Include="..\..\machine_learning\Cross_validation.cpp" />
     <ClCompile Include="..\..\machine_learning\Dataset.cpp" />
-    <ClCompile Include="..\..\machine_learning\id3tree.cpp" />
+    <ClCompile Include="..\..\machine_learning\Decision_node.cpp" />
     <ClCompile Include="..\..\machine_learning\id3_algorithm.cpp" />
     <ClCompile Include="..\..\machine_learning\Knnalgorithm.cpp" />
     <ClCompile Include="..\..\machine_learning\main.cpp" />
@@ -162,7 +162,7 @@
     <ClInclude Include="..\..\machine_learning\Boosting.h" />
     <ClInclude Include="..\..\machine_learning\Cross_validation.h" />
     <ClInclude Include="..\..\machine_learning\Dataset.h" />
-    <ClInclude Include="..\..\machine_learning\id3tree.h" />
+    <ClInclude Include="..\..\machine_learning\Decision_node.h" />
     <ClInclude Include="..\..\machine_learning\id3_algorithm.h" />
     <ClInclude Include="..\..\machine_learning\Knnalgorithm.h" />
     <ClInclude Include="..\..\machine_learning\Neuralnetwork.h" />

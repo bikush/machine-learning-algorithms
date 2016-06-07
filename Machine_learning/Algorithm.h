@@ -43,8 +43,10 @@ public:
 template<class T, class D>
 class Algorithm {
 public:
-	virtual ~Algorithm(){ static_assert(std::is_base_of<Classifier<D>, T>::value,
-			                            "class T not derived from Classifier");};
+	virtual ~Algorithm(){ 
+		static_assert(std::is_base_of<Classifier<D>, T>::value,
+			          "class T not derived from Classifier");
+	};
 	virtual void setup(const Algorithm_parameters& parameters) = 0;
 	virtual T learn(const Data_set & data_set) = 0;
 };
