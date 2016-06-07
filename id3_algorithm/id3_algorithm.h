@@ -11,6 +11,8 @@ class id3_algorithm{
 public:
 	id3_algorithm(Data_set & data);
 	id3_node operator()();
+
+	static void run_examples();
 private:
 	id3_node calculate(const std::vector<int> &, const std::vector<std::string> &);
 	std::string find_most_common_class(const std::vector<int> & subset);
