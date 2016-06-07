@@ -1,6 +1,7 @@
 #include "id3_algorithm.h"
 #include "Dataset.h"
 #include <iostream>
+#include <climits>
 using namespace std;
 
 id3_algorithm::id3_algorithm(int depth) 

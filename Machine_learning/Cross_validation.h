@@ -65,7 +65,7 @@ public:
 			double avg_error = 0.0;
 			for (int val_idx = 0; val_idx < validate.get_size(); val_idx++) {
 				auto data = validate.get_elem(val_idx);
-				T::class_type class_guess;
+				typename T::class_type class_guess;
 				classifier.classify( data, class_guess);
 				double error = data_set.measure_error(data, class_guess);
 				avg_error += error;
