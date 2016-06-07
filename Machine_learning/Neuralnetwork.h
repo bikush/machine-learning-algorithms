@@ -27,6 +27,8 @@ public:
 	static double test(Neural_network & nn, const std::vector<double> & inputs, const std::vector<double> & targets);
 	static double test(Neural_network & nn, const Data_set & test_set);
 	std::vector<double> calculate(const std::vector<double> & inputs);
+
+	static void run_examples();
 private:
 	double eta;
 	double ok;
