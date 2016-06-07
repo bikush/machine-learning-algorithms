@@ -276,7 +276,7 @@ void generate_sin(vector<double> & values, vector<double> & res) {
 	}
 }
 
-void sine_example(int iterations = 1000) {
+void nn_sine_example(int iterations = 1000) {
 	vector<int> init{ 1, 3, 1 };
 	vector<vector<double>> inputs(1);
 	vector<vector<double>> outputs(1);
@@ -314,7 +314,7 @@ void sine_example(int iterations = 1000) {
 	cout << "avg span: " << (max_error - min_error) / 2.0 << endl;
 }
 
-void xor_example(int iterations = 1000) {
+void nn_xor_example(int iterations = 1000) {
 	vector<int> init{ 2, 3, 1 };
 	vector<vector<double>> inputs(2);
 	vector<vector<double>> outputs(1);
@@ -330,7 +330,7 @@ void xor_example(int iterations = 1000) {
 	Neural_network::test(nn, vector<double>{0, 0}, vector<double>{0});
 }
 
-void tennis_example(int iterations = 1000) {
+void nn_tennis_example(int iterations = 1000) {
 	//Data_set::_test_normalize_columns();
 
 	string file_name = "../data/tennis.txt";
@@ -348,7 +348,7 @@ void tennis_example(int iterations = 1000) {
 	Neural_network::test(nn, test);
 }
 
-void zoo_example(int iterations = 1000) {
+void nn_zoo_example(int iterations = 1000) {
 	//Data_set::_test_normalize_columns();
 
 	string file_name = "../data/zoo.txt";
@@ -369,11 +369,11 @@ void zoo_example(int iterations = 1000) {
 
 void Neural_network::run_examples() {
 	/* xor example:*/
-	//xor_example(100000);
+	//nn_xor_example(100000);
 
 	/*sine example:*/
-	//sine_example(1000);
+	//nn_sine_example(1000);
 
-	//tennis_example( 1000 );
-	zoo_example(1000);
+	//nn_tennis_example( 1000 );
+	nn_zoo_example(1000);
 }

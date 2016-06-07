@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{FB7337F1-89CA-4E58-95EF-BBEA337CF3B0}</ProjectGuid>
+    <ProjectGuid>{BA3E129C-77BA-477A-8FDC-676BD0404A75}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>id3_algorithm</RootNamespace>
+    <RootNamespace>Machine_learning</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,17 +71,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <SourcePath>$(VC_SourcePath)</SourcePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <SourcePath>$(VC_SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -94,12 +89,10 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Data_set\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)..\$(Configuration)\Data_set.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,14 +119,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Data_set\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)..\$(Configuration)\Data_set.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -155,17 +146,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\id3_algorithm\id3tree.cpp" />
-    <ClCompile Include="..\..\id3_algorithm\id3_algorithm.cpp" />
-    <ClCompile Include="..\..\id3_algorithm\main.cpp" />
+    <ClCompile Include="..\..\machine_learning\Boosting.cpp" />
+    <ClCompile Include="..\..\machine_learning\Cross_validation.cpp" />
+    <ClCompile Include="..\..\machine_learning\Dataset.cpp" />
+    <ClCompile Include="..\..\machine_learning\id3tree.cpp" />
+    <ClCompile Include="..\..\machine_learning\id3_algorithm.cpp" />
+    <ClCompile Include="..\..\machine_learning\Knnalgorithm.cpp" />
+    <ClCompile Include="..\..\machine_learning\main.cpp" />
+    <ClCompile Include="..\..\machine_learning\Neuralnetwork.cpp" />
+    <ClCompile Include="..\..\machine_learning\Neuron.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\data\tennis.txt" />
-    <Text Include="..\data\zoo.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\id3_algorithm\id3tree.h" />
-    <ClInclude Include="..\..\id3_algorithm\id3_algorithm.h" />
+    <ClInclude Include="..\..\machine_learning\Boosting.h" />
+    <ClInclude Include="..\..\machine_learning\Cross_validation.h" />
+    <ClInclude Include="..\..\machine_learning\Dataset.h" />
+    <ClInclude Include="..\..\machine_learning\id3tree.h" />
+    <ClInclude Include="..\..\machine_learning\id3_algorithm.h" />
+    <ClInclude Include="..\..\machine_learning\Knnalgorithm.h" />
+    <ClInclude Include="..\..\machine_learning\Neuralnetwork.h" />
+    <ClInclude Include="..\..\machine_learning\Neuron.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

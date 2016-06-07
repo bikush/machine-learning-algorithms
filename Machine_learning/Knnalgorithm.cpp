@@ -204,7 +204,7 @@ void db_test(const string & file_name, const string & class_name, int k) {
 	knn.test(test);
 }
 
-void zoo_example(int k = 2) {
+void knn_zoo_example(int k = 2) {
 	//Data_set::_test_normalize_columns();
 	cout << "ZOO example" << endl;
 	string file_name = "../data/zoo.txt";
@@ -213,7 +213,7 @@ void zoo_example(int k = 2) {
 	cout << endl;
 }
 
-void tennis_example(int k = 2) {
+void knn_tennis_example(int k = 2) {
 	//Data_set::_test_normalize_columns();
 	cout << "Tennis example" << endl;
 	string file_name = "../data/tennis.txt";
@@ -222,7 +222,7 @@ void tennis_example(int k = 2) {
 	cout << endl;
 }
 
-void simple_example(int k = 2) {
+void knn_simple_example(int k = 2) {
 	int num_samples = 100;
 	vector<vector<double>> inputs(num_samples*num_samples, vector<double>(2));
 	vector<vector<double>> outputs(num_samples*num_samples, vector<double>(1));
@@ -259,7 +259,7 @@ void simple_example(int k = 2) {
 }
 
 void Knn_algorithm::run_examples() {
-	simple_example(1);
-	zoo_example(3);
-	tennis_example();
+	knn_simple_example(1);
+	knn_zoo_example(3);
+	knn_tennis_example();
 }
