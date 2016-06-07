@@ -13,12 +13,117 @@
 
 using namespace std;
 
-Neural_network::Neural_network(const vector<int> & init, double learning_rate, double acceptable_error):
-		eta{learning_rate}, ok{acceptable_error}, config{init} {
-	if (init.size() <= 2) throw runtime_error("Invalid initialization of neural network");
-	num_layers = init.size();
+double Neural_network::test(Neural_network & nn, const vector<double> & inputs, const vector<double> & targets) {
+	vector<double> res = nn.calculate(inputs);
+	double coumpound_error = 0.0;
+	cout << "Neural network test with inputs:" << endl;
+	for (size_t i=0; i<inputs.size(); i++) {
+		cout << "input[" << i << "] = " << inputs[i] << endl;
+	}
+	for (size_t i=0; i<res.size(); i++) {
+		cout << "output[" << i << "] = " << res[i] << endl;
+		cout << "expected output: " << targets[i] << endl;
+		coumpound_error += abs(targets[i] - res[i]);
+		cout << "ERROR = " <<  abs(targets[i] -res[i]) << endl;
+	}
+	cout << endl;
+	return coumpound_error / res.size();
+}
+
+double Neural_network::test(Neural_network & nn, const Data_set & test_set)
+{
+	vector<vector<double>> inputs;
+	vector<vector<double>> outputs;
+	test_set.normalized_data(inputs, outputs);
+	auto normalizer = test_set.attr.get_normalizer();
+	auto attr_outputs = test_set.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
+
+	int test_size = test_set.get_size();
+	double total_error = 0.0;
+	double misslabel_error = 0.0;
+	int misslabel_count = 0;
+	for (int test_idx = 0; test_idx < test_size; test_idx++) {
+		vector<double> res = nn.calculate(inputs[test_idx]);
+		vector<double> target = outputs[test_idx];
+
+		auto res_labels = normalizer.undo_normalize(attr_outputs, res);
+		auto target_labels = normalizer.undo_normalize(attr_outputs, target);
+
+		double coumpound_error = 0.0;
+		for (size_t i = 0; i<res.size(); i++) {
+			if (res_labels[i].second != target_labels[i].second) {
+				misslabel_count++;
+				misslabel_error += res_labels[i].first;
+			}
+
+			cout << "output[" << i << "] = " << res[i] << " (" << res_labels[i].second << "," << res_labels[i].first << ")" << endl;
+			cout << "expected output: " << target[i] << " (" << target_labels[i].second << ")" << endl;
+			coumpound_error += abs(target[i] - res[i]);
+			cout << "ERROR = " << abs(target[i] - res[i]) << endl;
+		}
+		total_error += coumpound_error / res.size();
+	}
+	total_error /= test_size;
+	cout << "Total error: " << total_error << endl;
+	cout << "Misslabel count: " << misslabel_count << " (" << double(misslabel_count)/test_size << ")" << endl;
+	cout << "Only misslabel error: " << misslabel_error / test_size << endl;
+
+	return double(misslabel_count) / test_size;
+}
+
+vector<double> Neural_network::calculate(const vector<double> & inputs){
+	vector<double> out(neurons_per_layer[num_layers-1]);
+	for (size_t i=0; i < inputs.size(); i++) {
+		neurons_at_layer[0][i].set_out(inputs[i]);
+	}
+	calculate_outputs();
+	for (size_t i=0; i < out.size(); i++) {
+		out[i] = neurons_at_layer[num_layers-1][i].get_out();
+	}
+	return out;
+}
+
+double activation_func(double net) {
+	return 1./(1.+exp(-net));
+}
+void Neural_network::calculate_outputs() {
+	for (int i=1; i < num_layers; i++) {
+		for (int j=0; j< neurons_per_layer[i]; j++) {
+			if (is_bias(i, j)) continue;
+			auto keys = neurons_at_layer[i][j].in_edges_keys();
+			double res = 0.0;
+			for (const auto & key: keys) {
+				double out = neurons_at_layer[key.layer][key.in].get_out();
+				double w =  neurons_at_layer[key.layer][key.in].out_edges_weights(key);
+				res += out*w;
+			}
+			neurons_at_layer[i][j].set_out(activation_func(res));
+		}
+	}
+}
+
+void Neural_network::classify(const Data & d, double & out) {
+	out = 0.0;
+}
+
+
+
+void Neural_network::setup(const Algorithm_parameters& param) {
+	parameters = param;
+	eta = param.get_double("eta");
+	ok = param.get_double("tolerance");
+	epoch_count = param.get_int("epoch_count");
+	std::string conf = param.get("config");
+	std::istringstream is{conf};
+	while (is) {
+		int i;
+		is >> i;
+		config.push_back(i);
+	}
+	if (config.size() <= 2) throw runtime_error("Invalid initialization of neural network");
+	num_layers = config.size();
 	for (int i=0; i < num_layers; i++) {
-		neurons_per_layer.push_back(init[i]);
+		neurons_per_layer.push_back(config[i]);
 	}
 	/*add bias*/
 	for (int i=0; i < num_layers-1; i++) {
@@ -50,24 +155,12 @@ void Neural_network::build_network() {
 	}
 }
 
+Neural_network Neural_network::learn(const Data_set & data_set) {
+	vector<vector<double>> inputs;
+	vector<vector<double>> outputs;
 
-double activation_func(double net) {
-	return 1./(1.+exp(-net));
-}
-void Neural_network::calculate_outputs() {
-	for (int i=1; i < num_layers; i++) {
-		for (int j=0; j<neurons_per_layer[i]; j++) {
-			if (is_bias(i, j)) continue;
-			auto keys = neurons_at_layer[i][j].in_edges_keys();
-			double res = 0.0;
-			for (const auto & key: keys) {
-				double out = neurons_at_layer[key.layer][key.in].get_out();
-				double w =  neurons_at_layer[key.layer][key.in].out_edges_weights(key);
-				res += out*w;
-			}
-			neurons_at_layer[i][j].set_out(activation_func(res));
-		}
-	}
+	data_set.normalized_data(inputs, outputs);
+	return this->operator()(inputs, outputs);
 }
 
 double activation_func_der(double out) {
@@ -128,77 +221,7 @@ bool Neural_network::back_propagation(const vector<double> & targets) {
 	return res;
 }
 
-double Neural_network::test(Neural_network & nn, const vector<double> & inputs, const vector<double> & targets) {
-	vector<double> res = nn.calculate(inputs);
-	double coumpound_error = 0.0;
-	cout << "Neural network test with inputs:" << endl;
-	for (size_t i=0; i<inputs.size(); i++) {
-		cout << "input[" << i << "] = " << inputs[i] << endl;
-	}
-	for (size_t i=0; i<res.size(); i++) {
-		cout << "output[" << i << "] = " << res[i] << endl;
-		cout << "expected output: " << targets[i] << endl;
-		coumpound_error += abs(targets[i] - res[i]);
-		cout << "ERROR = " <<  abs(targets[i] -res[i]) << endl;
-	}
-	cout << endl;
-	return coumpound_error / res.size();
-}
-
-double Neural_network::test(Neural_network & nn, const Data_set & test_set)
-{
-	vector<vector<double>> inputs;
-	vector<vector<double>> outputs;
-	test_set.normalized_data(inputs, outputs);
-	auto normalizer = test_set.attr.get_normalizer();
-	auto attr_outputs = test_set.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
-
-	int test_size = test_set.get_size();
-	double total_error = 0.0;
-	double misslabel_error = 0.0;
-	int misslabel_count = 0;
-	for (int test_idx = 0; test_idx < test_size; test_idx++) {
-		vector<double> res = nn.calculate(inputs[test_idx]);
-		vector<double> target = outputs[test_idx];
-
-		auto res_labels = normalizer.undo_normalize(attr_outputs, res);
-		auto target_labels = normalizer.undo_normalize(attr_outputs, target);
-
-		double coumpound_error = 0.0;
-		for (size_t i = 0; i<res.size(); i++) {
-			if (res_labels[i].second != target_labels[i].second) {
-				misslabel_count++;
-				misslabel_error += res_labels[i].first;
-			}
-
-			cout << "output[" << i << "] = " << res[i] << " (" << res_labels[i].second << "," << res_labels[i].first << ")" << endl;
-			cout << "expected output: " << target[i] << " (" << target_labels[i].second << ")" << endl;
-			coumpound_error += abs(target[i] - res[i]);
-			cout << "ERROR = " << abs(target[i] - res[i]) << endl;
-		}
-		total_error += coumpound_error / res.size();
-	}
-	total_error /= test_size;
-	cout << "Total error: " << total_error << endl;
-	cout << "Misslabel count: " << misslabel_count << " (" << double(misslabel_count)/test_size << ")" << endl;
-	cout << "Only misslabel error: " << misslabel_error / test_size << endl;
-	
-	return double(misslabel_count) / test_size;
-}
-
-vector<double> Neural_network::calculate(const vector<double> & inputs){
-	vector<double> out(neurons_per_layer[num_layers-1]);
-	for (size_t i=0; i < inputs.size(); i++) {
-		neurons_at_layer[0][i].set_out(inputs[i]);
-	}
-	calculate_outputs();
-	for (size_t i=0; i < out.size(); i++) {
-		out[i] = neurons_at_layer[num_layers-1][i].get_out();
-	}
-	return out;
-}
-
-void Neural_network::operator() (const vector<vector<double>> & inputs, const vector<vector<double>> & outputs, int epoch_count){
+Neural_network Neural_network::operator() (const vector<vector<double>> & inputs, const vector<vector<double>> & outputs){
 	size_t data_size = inputs.size();
 	assert (data_size > 0);
 	assert(data_size == outputs.size());
@@ -245,69 +268,61 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 	cout << "total duration " << total_duration.count() << "s" << endl;
 	cout << "calc " << calculation << "s (" << 100.0 * calculation / total_duration.count() << "%)" << endl;
 	cout << "back " << backpropagation << "s (" << 100.0 *  backpropagation / total_duration.count() << "%)" << endl;
-
-}
-
-
-void Neural_network::operator()(const Data_set & data, int epoch_count)
-{
-	vector<vector<double>> inputs;
-	vector<vector<double>> outputs;
-
-	data.normalized_data(inputs, outputs);
-	this->operator()(inputs, outputs, epoch_count);
+	return *this;
 }
 
 /*******************
  * E X A M P L E S *
  *******************/
 
-void transform_values(vector<double> & values, double offset, double scale) {
+void transform_values(vector<vector<double>> & values, double offset, double scale) {
 	for (size_t i = 0; i < values.size(); i++) {
-		values[i] = values[i] * scale + offset;
+		values[i][0] = values[i][0] * scale + offset;
 	}
 }
 
-void generate_sin(vector<double> & values, vector<double> & res) {
+void generate_sin(vector<vector<double>> & values, vector<vector<double>> & res) {
 	size_t size = values.size();
 	for (size_t i = 0; i < size; i++) {
-		values[i] = i*M_PI*2.0 / size;
-		res[i] = sin(values[i]);
+		values[i][0] = i*M_PI*2.0 / size;
+		res[i][0] = sin(values[i][0]);
 	}
 }
 
+
 void nn_sine_example(int iterations = 1000) {
-	vector<int> init{ 1, 3, 1 };
-	vector<vector<double>> inputs(1);
-	vector<vector<double>> outputs(1);
-	Neural_network nn{ init, 0.6 };
+	vector<vector<double>> inputs(50, vector<double>(1,0.));
+	vector<vector<double>> outputs(50, vector<double>(1,0.));
+	Neural_network nn{};
+	map<string, string> p;
+	p["eta"] = "0.01";
+	p["tolerance"] = "0.01";
+	p["epoch_count"] = to_string(iterations);
+	p["config"] = " 1 3 1 ";
+	Algorithm_parameters params{p};
+	nn.setup(params);
+	generate_sin(inputs, outputs);
+	transform_values(inputs, 0.0, 1 / (M_PI*2.0));
+	transform_values(outputs, 0.5, 0.5);
 
-	inputs[0] = vector<double>(50);
-	outputs[0] = vector<double>(50);
-	generate_sin(inputs[0], outputs[0]);
-	transform_values(inputs[0], 0.0, 1 / (M_PI*2.0));
-	transform_values(outputs[0], 0.5, 0.5);
+	nn(inputs, outputs);
 
-	nn(inputs, outputs, iterations);
-
-	vector<vector<double>> t_inputs(1);
-	vector<vector<double>> t_outputs(1);
-	t_inputs[0] = vector<double>(200);
-	t_outputs[0] = vector<double>(200);
-	generate_sin(t_inputs[0], t_outputs[0]);
-	transform_values(t_inputs[0], 0.0, 1 / (M_PI*2.0));
-	transform_values(t_outputs[0], 0.5, 0.5);
+	vector<vector<double>> t_inputs(200, vector<double>(1,0.));
+	vector<vector<double>> t_outputs(200, vector<double>(1,0.));
+	generate_sin(t_inputs, t_outputs);
+	transform_values(t_inputs, 0.0, 1 / (M_PI*2.0));
+	transform_values(t_outputs, 0.5, 0.5);
 
 	double total_error = 0.0;
 	double min_error = 1.0;
 	double max_error = 0.0;
-	for (size_t i = 0; i < t_inputs[0].size(); i++) {
-		double error = Neural_network::test(nn, vector<double>{t_inputs[0][i]}, vector<double>{t_outputs[0][i]});
+	for (size_t i = 0; i < t_inputs.size(); i++) {
+		double error = Neural_network::test(nn, vector<double>{t_inputs[i][0]}, vector<double>{t_outputs[i][0]});
 		total_error += error;
 		min_error = min(min_error, error);
 		max_error = max(max_error, error);
 	}
-	total_error /= t_inputs[0].size();
+	total_error /= t_inputs.size();
 	cout << "total error: " << total_error << endl;
 	cout << "min error: " << min_error << endl;
 	cout << "max error: " << max_error << endl;
@@ -315,14 +330,23 @@ void nn_sine_example(int iterations = 1000) {
 }
 
 void nn_xor_example(int iterations = 1000) {
-	vector<int> init{ 2, 3, 1 };
-	vector<vector<double>> inputs(2);
-	vector<vector<double>> outputs(1);
-	inputs[0] = vector<double>{ 0, 0, 1, 1 };
-	inputs[1] = vector<double>{ 0, 1, 0, 1 };
-	outputs[0] = vector<double>{ 0, 1, 1, 0 };
-	Neural_network nn{ init, 0.1 };
-	nn(inputs, outputs, iterations);
+	vector<vector<double>> inputs(4, vector<double>(2, 0.));
+	vector<vector<double>> outputs(4, vector<double>(1, 0.));
+	inputs[2][0] = 1;
+	inputs[3][0] = 1;
+	inputs[1][1] = 1;
+	inputs[3][1] = 1;
+	outputs[0][0] = 1;
+	outputs[3][0] = 1;
+	Neural_network nn{};
+	map<string, string> p;
+	p["eta"] = "0.01";
+	p["tolerance"] = "0.01";
+	p["epoch_count"] = to_string(iterations);
+	p["config"] = " 2 3 1 ";
+	Algorithm_parameters params{p};
+	nn.setup(params);
+	nn(inputs, outputs);
 
 	Neural_network::test(nn, vector<double>{1, 1}, vector<double>{0});
 	Neural_network::test(nn, vector<double>{1., 0}, vector<double>{1});
@@ -341,9 +365,16 @@ void nn_tennis_example(int iterations = 1000) {
 	Data_set train, test;
 	ds.distribute_split(train, test, 0.8);
 
-	vector<int> init{ train.attr.count_attr_by_usage(Attribute::Attribute_usage::input), 3, 1 };
-	Neural_network nn{ init, 0.1 };
-	nn(train, iterations);
+	Neural_network nn{};
+	map<string, string> p;
+	p["eta"] = "0.01";
+	p["tolerance"] = "0.01";
+	p["epoch_count"] = to_string(iterations);
+	string s = to_string(train.attr.count_attr_by_usage(Attribute::Attribute_usage::input));
+	p["config"] = s + " 3 1 ";
+	Algorithm_parameters params{p};
+	nn.setup(params);
+	nn.learn(train);
 
 	Neural_network::test(nn, test);
 }
@@ -359,13 +390,19 @@ void nn_zoo_example(int iterations = 1000) {
 	Data_set train, test;
 	ds.distribute_split(train, test, 0.8);
 
-	vector<int> init{ train.attr.count_attr_by_usage(Attribute::Attribute_usage::input), 5, 1 };
-	Neural_network nn{ init, 0.21 };
-	nn(train, iterations);
+	Neural_network nn{};
+	map<string, string> p;
+	p["eta"] = "0.6";
+	p["tolerance"] = "0.01";
+	p["epoch_count"] = to_string(iterations);
+	string s = to_string(train.attr.count_attr_by_usage(Attribute::Attribute_usage::input));
+	p["config"] = s + " 3 1 ";
+	Algorithm_parameters params{p};
+	nn.setup(params);
+	nn.learn(train);
 
 	Neural_network::test(nn, test);
 }
-
 
 void Neural_network::run_examples() {
 	/* xor example:*/
@@ -375,5 +412,5 @@ void Neural_network::run_examples() {
 	//nn_sine_example(1000);
 
 	//nn_tennis_example( 1000 );
-	nn_zoo_example(1000);
+	nn_zoo_example(10000);
 }
