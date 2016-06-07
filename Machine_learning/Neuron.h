@@ -13,20 +13,22 @@
 
 struct Edge_key {
 	Edge_key(int l = 0, int i = 0, int o = 0) : layer{ l }, in{ i }, out{ o } {
-		std::stringstream ss1{};
-		ss1<<layer<< " " <<in<< " " << out;
-		desc = ss1.str();
+		//std::stringstream ss1{};
+		//ss1<<layer<< " " <<in<< " " << out;
+		//desc = ss1.str();
+		signature = (l << 20) + (i << 10) + o;
 	}
 	int layer;
 	int in;
 	int out;
 	
 	bool operator<(const Edge_key& key) const{
-		return desc < key.desc;
+		//return desc < key.desc;
+		return signature < key.signature;
 	}
 private:
-	std::string desc;
-
+	//std::string desc;
+	int signature;
 };
 
 

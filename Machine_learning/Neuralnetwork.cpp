@@ -412,5 +412,5 @@ void Neural_network::run_examples() {
 	//nn_sine_example(1000);
 
 	//nn_tennis_example( 1000 );
-	nn_zoo_example(10000);
+	nn_zoo_example(2000);
 }
