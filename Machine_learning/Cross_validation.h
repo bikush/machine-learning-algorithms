@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "Dataset.h"
 #include "Algorithm.h"
+#include "id3_algorithm.h"
 
 class Spoof_classifier:public Classifier<double> {
 public:
@@ -46,13 +47,13 @@ public:
 class Cross_validation
 {
 public:
-
 	template<class T>
 	static std::vector<double> k_fold_t(const Data_set& data_set, const Algorithm_parameters& param, int k) {
 		T algorithm;
 		algorithm.setup(param);
 		return k_fold(data_set, algorithm, k);
 	}
+
 	template <class T>
 	static std::vector<double> k_fold(const Data_set& data_set, T & algorithm, int k) {
 		k = k < 2 ? 2 : (k > data_set.get_size() ? data_set.get_size() : k);
@@ -63,8 +64,10 @@ public:
 			auto classifier = algorithm.learn(train);
 			double avg_error = 0.0;
 			for (int val_idx = 0; val_idx < validate.get_size(); val_idx++) {
-				double error;
-				classifier.classify( validate.get_elem(val_idx), error);
+				auto data = validate.get_elem(val_idx);
+				T::class_type class_guess;
+				classifier.classify( data, class_guess);
+				double error = data_set.measure_error(data, class_guess);
 				avg_error += error;
 			}
 			avg_error /= validate.get_size();
@@ -75,14 +78,16 @@ public:
 
 	static void test() {
 		//Spoof_la spoof;
+		// TODO: fix the example?
 		Algorithm_parameters params{ {std::pair<std::string,std::string>("error","0.15")} };
-		Data_set data;
+		Data_set data("data1");
 		Data fake_data{ {"data1","data2"} };
 		fake_data.set_value("data1", "one");
 		fake_data.set_value("data2", "two");
 		for (int i = 0; i < 500; i++) {
 			data.append_data(fake_data);
 		}
+		data.attr.generate_normalizer();
 		//spoof.setup(params);
 		//auto result = k_fold(data, spoof, 10);
 		for (int i = 10; i > 1; i--) {
@@ -101,5 +106,27 @@ public:
 			std::cout << idx << ": " << res << std::endl;
 			idx++;
 		}*/
+	}
+
+	static void id3_test() {
+		Algorithm_parameters params{};
+		Data_set data = Data_set::load_zoo();
+		data.shuffle_data();
+
+		for (int i = 10; i > 1; i--) {
+			std::cout << "K: " << i;
+			auto result = k_fold_t<id3_algorithm>(data, params, i);
+			double error = 0.0;
+			for (auto res : result) {
+				error += res;
+			}
+			error /= result.size();
+			std::cout << ", error: " << error << std::endl;
+		}
+	}
+
+	static void run_examples() {
+		//test();
+		id3_test();
 	}
 };

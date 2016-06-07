@@ -8,9 +8,9 @@
 int main () {
 	//Neural_network::run_examples();
 	//Knn_algorithm::run_examples();
-	id3_algorithm::run_examples();
+	//id3_algorithm::run_examples();
 	//Boosting::run_examples();
-	//Cross_validation::test();
+	Cross_validation::run_examples();
 
 	return 0;
 }
