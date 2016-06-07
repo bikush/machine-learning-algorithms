@@ -50,7 +50,7 @@ local.properties
  
 # Locally stored "Eclipse launch configurations"
 *.launch
-
+RemoteSystemsTempFiles/
  
 # PDT-specific
 .buildpath
