@@ -36,6 +36,6 @@ void zoo_example(int iterations = 5) {
 int main() {
 	tennis_example();
 
-	zoo_example(); /*cannot work, the output is not binary!*/
+	//zoo_example(); /*cannot work, the output is not binary!*/
 	return 0;
 }
