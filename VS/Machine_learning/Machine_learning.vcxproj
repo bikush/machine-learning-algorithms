@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Machine_learning\Algorithm.cpp" />
     <ClCompile Include="..\..\machine_learning\Boosting.cpp" />
     <ClCompile Include="..\..\machine_learning\Cross_validation.cpp" />
     <ClCompile Include="..\..\machine_learning\Dataset.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="..\..\machine_learning\Neuron.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Machine_learning\Algorithm.h" />
     <ClInclude Include="..\..\machine_learning\Boosting.h" />
     <ClInclude Include="..\..\machine_learning\Cross_validation.h" />
     <ClInclude Include="..\..\machine_learning\Dataset.h" />

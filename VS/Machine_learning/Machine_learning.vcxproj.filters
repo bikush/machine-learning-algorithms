@@ -42,6 +42,9 @@
     <ClCompile Include="..\..\machine_learning\Neuron.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Machine_learning\Algorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\machine_learning\Boosting.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\machine_learning\Neuron.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Machine_learning\Algorithm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
