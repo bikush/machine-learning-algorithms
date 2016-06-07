@@ -125,6 +125,34 @@ Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<
  * E X A M P L E S *
  *******************/
 
+void repeat_test( int reps = 50 ) {
+	Data_set ds;
+	string file_name = "../data/tennis.txt", class_name = "Play", name = "Day";
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set train;
+	Data_set test;
+
+	double compound = 0;
+	for (int r = 0; r < reps; r++) {
+		ds.distribute_split(train, test, 0.65, true);
+
+		id3_algorithm id3{ train };
+		Decision_node root = id3();
+
+		int count = 0;
+		for (int i = 0; i < test.get_size(); i++) {
+			Data d{ test.get_elem(i) };
+			string res = root.classify(d);
+			if (d.get_value(class_name) == res) {
+				count++;
+			}
+		}
+		compound += count / (double)test.get_size();
+	}
+	cout << "Correctness: " << compound / reps << endl;
+}
+
 
 void id3_test(string file_name, string class_name, string name) {
 	Data_set ds;
@@ -156,6 +184,7 @@ void id3_test(string file_name, string class_name, string name) {
 }
 
 void id3_algorithm::run_examples() {
-	id3_test("../data/tennis.txt", "Play", "Day");
+	repeat_test();
+	//id3_test("../data/tennis.txt", "Play", "Day");
 	//id3_test("../data/zoo.txt", "type", "object");
 }
