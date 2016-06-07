@@ -3,13 +3,14 @@
 #include <iostream>
 using namespace std;
 
-id3_algorithm::id3_algorithm() 
+id3_algorithm::id3_algorithm(int depth) 
 {
+	set_max_depth(depth);
 }
 
 void id3_algorithm::setup(const Algorithm_parameters& parameters)
 {
-
+	set_max_depth( max(0, parameters.get_int("depth")) );
 }
 
 Decision_node id3_algorithm::learn(const Data_set & data_set)
@@ -24,7 +25,15 @@ Decision_node id3_algorithm::learn(const Data_set & data_set)
 		subset.push_back(i);
 	}
 
-	return calculate(subset, ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input));
+	return calculate(subset, ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input), max_depth);
+}
+
+void id3_algorithm::set_max_depth(int depth)
+{
+	max_depth = depth;
+	if (max_depth <= 0) {
+		max_depth = INT_MAX;
+	}
 }
 
 double id3_algorithm::calculate_entropy(const vector<int> & subset) {
@@ -74,7 +83,7 @@ string id3_algorithm::find_most_common_class(const vector<int> & subset) {
 	return common;
 }
 
-Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<string> & attributes) {
+Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<string> & attributes, int depth) {
 	for (const auto & val: class_vals) {
 		bool all_the_same= true;
 		for (int i: subset) {
@@ -119,7 +128,12 @@ Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<
 		vector<int> res = ds.split_by_attr_val(subset, attribute, v);
 
 		if (res.size()) {
-			new_node.add_a_child(v, calculate(res, attr));
+			if (depth <= 1) {
+				new_node.add_a_child(v, Decision_node{ class_name, true, find_most_common_class(res) });
+			}
+			else {
+				new_node.add_a_child(v, calculate(res, attr, depth - 1));
+			}
 		} else {
 			// no val of this type found.
 			new_node.add_a_child(v, Decision_node{class_name, true, find_most_common_class(subset) });
@@ -145,8 +159,11 @@ void repeat_test( int reps = 50 ) {
 	for (int r = 0; r < reps; r++) {
 		ds.distribute_split(train, test, 0.65, true);
 
-		id3_algorithm id3_alg;
+		id3_algorithm id3_alg(1);
 		Decision_node root = id3_alg.learn(train);
+
+		root.print();
+		cout << endl;
 
 		int count = 0;
 		for (int i = 0; i < test.get_size(); i++) {

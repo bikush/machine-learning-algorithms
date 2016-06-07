@@ -9,20 +9,23 @@
 
 class id3_algorithm : public Algorithm<Decision_node, std::string>{
 public:
-	id3_algorithm();
+	id3_algorithm(int depth = 0);
 	
 	void setup(const Algorithm_parameters& parameters);
 	Decision_node learn(const Data_set & data_set);
 
+	void set_max_depth(int depth);
+
 	static void run_examples();
 private:
-	Decision_node calculate(const std::vector<int> &, const std::vector<std::string> &);
+	Decision_node calculate(const std::vector<int> &, const std::vector<std::string> &, int);
 	std::string find_most_common_class(const std::vector<int> & subset);
 	double calculate_entropy(const std::vector<int> &);
 	double calculate_gain(const std::string & att, const std::vector<int> & subset);
 	
 	// TODO: id3 algo is suboptimal with copying the data_set at every learning phase
 	Data_set ds;
+	int max_depth;
 	std::string class_name;
 	std::set<std::string> class_vals;
 };

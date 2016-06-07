@@ -109,7 +109,7 @@ public:
 	}
 
 	static void id3_test() {
-		Algorithm_parameters params{};
+		Algorithm_parameters params{ { std::pair<std::string,std::string>("depth","1") } };
 		Data_set data = Data_set::load_zoo();
 		data.shuffle_data();
 

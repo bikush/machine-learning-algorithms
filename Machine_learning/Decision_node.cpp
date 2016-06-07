@@ -24,8 +24,8 @@ void Decision_node::print(int depth) {
 
 	for (auto p: get_nodes()) {
 		cout << pre << pre;
-		cout<< "value: " << p.first << ", " << p.second.get_attr();
-		cout <<  ((p.second.is_leaf) ? (": " + leaf_val) : "") << endl;
+		cout<< "  value: " << p.first << ", " << p.second.get_attr();
+		cout << ((p.second.is_leaf) ? (": " + p.second.leaf_val) : "") << endl;
 		p.second.print(depth+1);
 	}
 }
