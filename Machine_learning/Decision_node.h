@@ -17,7 +17,7 @@ class Decision_node : public Classifier<std::string> {
 public:
 	Decision_node(){}
 	Decision_node(const std::string & attr, bool leaf=false, const std::string& leaf_value = ""):
-		is_leaf{leaf}, attribute{attr}, leaf_val(leaf_value){}
+		attribute{attr}, is_leaf{leaf}, leaf_val(leaf_value){}
 	void add_a_child(const std::string & val, const Decision_node & node) {branches[val] = node;}
 	void print( int depth = 0 );
 	std::string classify(const Data & d);

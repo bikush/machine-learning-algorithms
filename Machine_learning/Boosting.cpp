@@ -88,8 +88,16 @@ void Boosting::operator()(const Data_set &ds) {
 
 
 	int epoch_count = 2000;
+	map<string, string> p;
+	p["eta"] = "0.01";
+	p["tolerance"] = "0.01";
+	p["epoch_count"] = to_string(epoch_count);
+	p["config"] = to_string(num_inputs) + " 1 " + to_string(num_outputs);
+	Algorithm_parameters params{p};
 	for (int i=0; i < num_iterations; i++) {
 		Neural_network nn{};
+		nn.setup(params);
+
 		/*new learner*/
 		Data_set new_set;
 		if (i >= 0) {
