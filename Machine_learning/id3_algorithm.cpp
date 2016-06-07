@@ -3,10 +3,8 @@
 #include <iostream>
 using namespace std;
 
-id3_algorithm::id3_algorithm(const Data_set & data) : ds{ data }
+id3_algorithm::id3_algorithm() 
 {
-	class_name = ds.get_label_name();
-	class_vals = ds.attr.get_attr_values(class_name);
 }
 
 void id3_algorithm::setup(const Algorithm_parameters& parameters)
@@ -16,12 +14,17 @@ void id3_algorithm::setup(const Algorithm_parameters& parameters)
 
 Decision_node id3_algorithm::learn(const Data_set & data_set)
 {
-	id3_algorithm algo( data_set );
-	return algo();
-	//ds = data_set;
-	//class_name = ds.get_label_name();
-	//class_vals = ds.attr.get_attr_values(class_name);
-	//return this->operator()();
+	ds = data_set;
+	class_name = ds.get_label_name();
+	class_vals = ds.attr.get_attr_values(class_name);
+
+	vector<int> subset;
+	subset.reserve(ds.get_size());
+	for (int i = 0; i< ds.get_size(); i++) {
+		subset.push_back(i);
+	}
+
+	return calculate(subset, ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input));
 }
 
 double id3_algorithm::calculate_entropy(const vector<int> & subset) {
@@ -70,16 +73,6 @@ string id3_algorithm::find_most_common_class(const vector<int> & subset) {
 	}
 	return common;
 }
-
-Decision_node id3_algorithm::operator()() {
-	vector<int> subset;
-	subset.reserve(ds.get_size());
-	for (int i=0; i< ds.get_size(); i++) {
-		subset.push_back(i);
-	}
-	return calculate(subset, ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input));
-}
-
 
 Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<string> & attributes) {
 	for (const auto & val: class_vals) {
@@ -152,8 +145,8 @@ void repeat_test( int reps = 50 ) {
 	for (int r = 0; r < reps; r++) {
 		ds.distribute_split(train, test, 0.65, true);
 
-		id3_algorithm id3{ train };
-		Decision_node root = id3();
+		id3_algorithm id3_alg;
+		Decision_node root = id3_alg.learn(train);
 
 		int count = 0;
 		for (int i = 0; i < test.get_size(); i++) {
@@ -178,9 +171,9 @@ void id3_test(string file_name, string class_name, string name) {
 	ds.distribute_split(train, test, 0.65, true);
 
 	cout << "data length: " << ds.get_size() << endl;
-	id3_algorithm id3{ train };
 	cout << "train data length: " << train.get_size() << endl;
-	Decision_node root = id3();
+	id3_algorithm id3;
+	Decision_node root = id3.learn(train);
 
 	root.print();
 
