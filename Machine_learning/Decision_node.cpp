@@ -36,3 +36,8 @@ string Decision_node::classify(const Data & d) {
 	string val = d.get_value(attribute);
 	return branches[val].classify(d);
 }
+
+void Decision_node::classify(const Data & d, std::string & out)
+{
+	out = classify(d);
+}

@@ -11,15 +11,19 @@
 #include <set>
 #include <map>
 #include "Dataset.h"
+#include "Algorithm.h"
 
-class Decision_node {
+class Decision_node : public Classifier<std::string> {
 public:
 	Decision_node(){}
 	Decision_node(const std::string & attr, bool leaf=false, const std::string& leaf_value = ""):
 		is_leaf{leaf}, attribute{attr}, leaf_val(leaf_value){}
 	void add_a_child(const std::string & val, const Decision_node & node) {branches[val] = node;}
 	void print( int depth = 0 );
-	virtual std::string classify(const Data & d);
+	std::string classify(const Data & d);
+
+	// Classifier<string>
+	void classify(const Data & d, std::string & out);
 
 private:
 	std::string attribute;

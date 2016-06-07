@@ -3,10 +3,25 @@
 #include <iostream>
 using namespace std;
 
-id3_algorithm::id3_algorithm(Data_set & data) : ds{ data }
+id3_algorithm::id3_algorithm(const Data_set & data) : ds{ data }
 {
 	class_name = ds.get_label_name();
 	class_vals = ds.attr.get_attr_values(class_name);
+}
+
+void id3_algorithm::setup(const Algorithm_parameters& parameters)
+{
+
+}
+
+Decision_node id3_algorithm::learn(const Data_set & data_set)
+{
+	id3_algorithm algo( data_set );
+	return algo();
+	//ds = data_set;
+	//class_name = ds.get_label_name();
+	//class_vals = ds.attr.get_attr_values(class_name);
+	//return this->operator()();
 }
 
 double id3_algorithm::calculate_entropy(const vector<int> & subset) {
