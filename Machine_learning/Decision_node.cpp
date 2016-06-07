@@ -25,14 +25,14 @@ void Decision_node::print(int depth) {
 	for (auto p: get_nodes()) {
 		cout << pre << pre;
 		cout<< "value: " << p.first << ", " << p.second.get_attr();
-		cout <<  ((p.second.is_leaf) ? ": " + *(p.second.get_vals().begin()) : "") << endl;
+		cout <<  ((p.second.is_leaf) ? (": " + leaf_val) : "") << endl;
 		p.second.print(depth+1);
 	}
 }
 
 string Decision_node::classify(const Data & d) {
 
-	if (is_leaf) return *(att_vals.begin());
+	if (is_leaf) return leaf_val;
 	string val = d.get_value(attribute);
 	return branches[val].classify(d);
 }

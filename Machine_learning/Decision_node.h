@@ -15,19 +15,19 @@
 class Decision_node {
 public:
 	Decision_node(){}
-	Decision_node(const std::string & attr, const std::set<std::string> & vals, bool leaf=false): is_leaf{leaf}, attribute{attr}, att_vals{vals}{}
+	Decision_node(const std::string & attr, bool leaf=false, const std::string& leaf_value = ""):
+		is_leaf{leaf}, attribute{attr}, leaf_val(leaf_value){}
 	void add_a_child(const std::string & val, const Decision_node & node) {branches[val] = node;}
 	void print( int depth = 0 );
 	virtual std::string classify(const Data & d);
 
 private:
 	std::string attribute;
-	std::set<std::string> att_vals;
 	std::map<std::string, Decision_node> branches;
 	bool is_leaf = false;
+	std::string leaf_val = "";
 
 	const std::string & get_attr() const { return attribute; }
-	const std::set<std::string> & get_vals() const { return att_vals; }
 	const std::map<std::string, Decision_node> & get_nodes() const { return branches; }
 
 };

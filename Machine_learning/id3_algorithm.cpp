@@ -34,7 +34,7 @@ double id3_algorithm::calculate_gain(const string & att, const vector<int> & sub
 		double p = double(indexes.size())/ds.get_size();
 		res += p * calculate_entropy(indexes);
 	}
-	cout << att << " gain " << res << endl;
+	//cout << att << " gain " << res << endl;
 	return res;
 }
 
@@ -76,14 +76,14 @@ Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<
 			}
 		}
 		if (all_the_same) {
-			return Decision_node{class_name, set<string>{val}, true};
+			return Decision_node{class_name, true, val};
 		}
 	}
 
 
     // check if the are any more attributes:
 	if (attributes.size() == 0) {
-		return Decision_node{class_name, set<string>{find_most_common_class(subset)}, true};
+		return Decision_node{class_name, true, find_most_common_class(subset) };
 	}
 
 	double min = calculate_gain(attributes[0], subset);
@@ -97,7 +97,7 @@ Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<
 			attribute = att;
 		}
 	}
-	cout << "I select: " << attribute << endl;
+	//cout << "I select: " << attribute << endl;
 	// remove selected attribute
 	vector<string> attr;
 	for (const auto & at: attributes) {
@@ -106,7 +106,7 @@ Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<
 	}
 	// do the splitting
 	auto vals = ds.attr.get_attr_values(attribute);
-	Decision_node new_node{attribute, vals};
+	Decision_node new_node{attribute};
 	for (const auto & v : vals) {
 		vector<int> res = ds.split_by_attr_val(subset, attribute, v);
 
@@ -114,7 +114,7 @@ Decision_node id3_algorithm::calculate(const vector<int> & subset, const vector<
 			new_node.add_a_child(v, calculate(res, attr));
 		} else {
 			// no val of this type found.
-			new_node.add_a_child(v, Decision_node{class_name, set<string>{find_most_common_class(subset)}, true});
+			new_node.add_a_child(v, Decision_node{class_name, true, find_most_common_class(subset) });
 		}
 	}
 	return new_node;
