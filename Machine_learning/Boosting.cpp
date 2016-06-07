@@ -89,7 +89,7 @@ void Boosting::operator()(const Data_set &ds) {
 
 	int epoch_count = 2000;
 	for (int i=0; i < num_iterations; i++) {
-		Neural_network nn{vector<int>{num_inputs,1, num_outputs}};
+		Neural_network nn{};
 		/*new learner*/
 		Data_set new_set;
 		if (i >= 0) {
@@ -97,7 +97,8 @@ void Boosting::operator()(const Data_set &ds) {
 		} else {
 			new_set = tmp;
 		}
-		nn(new_set, epoch_count); /*epoch count is 2000.*/
+		//nn(new_set, epoch_count); /*epoch count is 2000.*/
+		nn.learn(new_set);
 		if (calculate_new_distribution(nn, tmp) == 0.) {
 			num_iterations = i+1;
 			break;
