@@ -44,7 +44,7 @@ struct Attribute{
 class Attribute_normalizer {
 public:
 	void add_attribute( const std::string & attr_name, const std::set<std::string> & values);
-	void normalize(const Data & data, const std::vector<std::string> & attributes, std::vector<double>& output);
+	void normalize(const Data & data, const std::vector<std::string> & attributes, std::vector<double>& output) const;
 	std::vector<std::pair<double,std::string>> undo_normalize(const std::vector<std::string> & attributes, const std::vector<double> & value);
 	void reset() { transform.clear(); };
 private:
@@ -108,6 +108,13 @@ public:
 	static void _test_normalize();
 	static void _test_normalize_columns();
 	static void _test_distribute_fold();
+
+	static Data_set load_tennis();
+	static Data_set load_zoo();
+
+	double measure_error(const Data& data, const std::string& guessed_class) const;
+	double measure_error(const Data& data, double guessed_class) const;
+
 	
 private:
 	void define_attr_values(const Data & d);

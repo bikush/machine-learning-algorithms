@@ -285,21 +285,28 @@ void Data_set::distribute_boosting(Data_set & new_ds) {
 void Attribute_normalizer::add_attribute(const std::string & attr_name, const std::set<std::string> & values)
 {
 	map<string, double> attribute_transform;
-	double transform_value = 0.0;
-	double increment = 1.0 / (values.size() - 1);
-	for (string value : values) {
-		attribute_transform[value] = transform_value;
-		transform_value += increment;
+	if (values.size() == 1) {
+		attribute_transform[(*values.begin())] = 0.0;
+		span[attr_name] = 1.0;
+	}
+	else {
+		double transform_value = 0.0;
+		double increment = 1.0 / (values.size() - 1);
+		span[attr_name] = increment;
+		for (string value : values) {
+			attribute_transform[value] = transform_value;
+			transform_value += increment;
+		}
 	}
 	transform[attr_name] = attribute_transform;
-	span[attr_name] = increment;
 }
 
-void Attribute_normalizer::normalize(const Data & data, const std::vector<std::string>& attributes, std::vector<double>& output)
+void Attribute_normalizer::normalize(const Data & data, const std::vector<std::string>& attributes, std::vector<double>& output) const
 {
 	output.clear();
 	for (auto attribute : attributes) {
-		output.push_back(transform[attribute][data.get_value(attribute)]);
+		auto trans = transform.at(attribute);
+		output.push_back( trans.at(data.get_value(attribute)) );
 	}
 }
 
@@ -536,6 +543,38 @@ void Data_set::_test_distribute_fold()
 		}
 	}
 }
+
+
+Data_set Data_set::load_tennis() 
+{
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+	return ds;
+}
+
+Data_set Data_set::load_zoo()
+{
+	string file_name = "../data/zoo.txt";
+	string class_name = "type";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+	return ds;
+}
+
+double Data_set::measure_error(const Data& data, const std::string& guessed_class) const {
+	auto true_class = data.get_value(label_name);
+	return true_class == guessed_class ? 0.0 : 1.0;
+}
+
+double Data_set::measure_error(const Data& data, double guessed_class) const {
+	auto true_class = data.get_value(label_name);
+	vector<double> norm;
+	(attr.get_normalizer()).normalize(data, { label_name }, norm);
+	return abs(guessed_class - norm[0]);
+}
+
 
 vector<string> Attribute_set::get_attributes_of_kind(Attribute::Attribute_usage usage) const
 {
