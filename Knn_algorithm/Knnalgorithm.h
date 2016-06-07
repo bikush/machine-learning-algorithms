@@ -28,6 +28,8 @@ public:
 	void test(const Data_set & test);
 	std::vector<double> operator()(const std::vector<double> & query_point);
 	static constexpr double tolerance=1e-10;
+
+	static void run_examples();
 private:
 	std::vector<std::vector<double>> inputs;
 	std::vector<std::vector<double>> outputs;
