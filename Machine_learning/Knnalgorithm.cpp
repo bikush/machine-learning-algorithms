@@ -7,6 +7,8 @@
 
 #include "Knnalgorithm.h"
 #include "Dataset.h"
+#include <stdexcept>
+#include <assert.h>
 
 using namespace  std;
 
@@ -32,6 +34,16 @@ Knn_algorithm::Knn_algorithm(const Data_set & data, int nn, distance_function d,
 	assert(in_s > 0);
 	assert(in_s > nn);
 }
+
+void Knn_algorithm::classify(const Data & d, double & out) {
+
+};
+void Knn_algorithm::setup(const Algorithm_parameters& parameters) {
+
+};
+Knn_algorithm Knn_algorithm::learn(const Data_set & data_set) {
+	return Knn_algorithm({}, {}, 0, distance_func, vote);
+};
 
 void Knn_algorithm::test(const Data_set & test) {
 	vector<vector<double>> in;

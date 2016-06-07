@@ -12,14 +12,13 @@
 #include <map>
 #include <algorithm>
 #include <iostream>
-#include <stdexcept>
-#include <assert.h>
+#include "Algorithm.h"
 
 typedef double(*distance_function)(const std::vector<double> &, const std::vector<double> &);
 
 class Data_set;
 
-class Knn_algorithm {
+class Knn_algorithm : public Classifier<double>, public Algorithm<Knn_algorithm, double> {
 public:
 	Knn_algorithm(const std::vector<std::vector<double>> & in,
 		      const std::vector<std::vector<double>> & out,
@@ -28,6 +27,10 @@ public:
 	void test(const Data_set & test);
 	std::vector<double> operator()(const std::vector<double> & query_point);
 	static constexpr double tolerance=1e-10;
+
+	void classify(const Data & d, double & out);
+	void setup(const Algorithm_parameters& parameters);
+	Knn_algorithm learn(const Data_set & data_set);
 
 	static void run_examples();
 private:
