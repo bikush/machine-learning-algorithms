@@ -142,3 +142,43 @@ void Boosting::classify(const Data_set & test_set){
 	cout << miss_classified << " missclassified out of " << outputs.size() << endl;
 	cout << "Total error: " << double(miss_classified)/outputs.size() << endl;
 }
+
+/*******************
+ * E X A M P L E S *
+ *******************/
+
+void boost_tennis_example(int iterations = 5) {
+	//Data_set::_test_normalize_columns();
+
+	string file_name = "../data/tennis.txt";
+	string class_name = "Play";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set train, test;
+	ds.distribute_split(train, test, 0.6);
+
+	Boosting boost{ iterations };
+	boost(train);
+	boost.classify(test);
+}
+
+void boost_zoo_example(int iterations = 5) {
+	string file_name = "../data/zoo.txt";
+	string class_name = "type";
+	Data_set ds;
+	ds.load_simple_db(file_name, class_name);
+
+	Data_set train, test;
+	ds.distribute_split(train, test, 0.8);
+
+	Boosting boost{ iterations };
+	boost(train);
+	boost.classify(test);
+}
+
+void Boosting::run_examples() {
+	boost_tennis_example();
+
+	//boost_zoo_example(); /*cannot work, the output is not binary!*/
+}
