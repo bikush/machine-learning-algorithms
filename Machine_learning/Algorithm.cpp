@@ -10,15 +10,15 @@
 
 using namespace std;
 
-string Algorithm_parameters::get(const string& name) {
+string Algorithm_parameters::get(const string& name) const {
 	return safe_get(name, "");
 }
 
-int Algorithm_parameters::get_int(const string& name) {
+int Algorithm_parameters::get_int(const string& name) const {
 	return stoi(safe_get(name, "0"));
 }
 
-double Algorithm_parameters::get_double(const string& name) {
+double Algorithm_parameters::get_double(const string& name) const {
 	return stod(safe_get(name, "0.0"));
 }
 

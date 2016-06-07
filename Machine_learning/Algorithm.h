@@ -21,11 +21,11 @@ public:
 	typedef std::map<std::string, std::string> param_map;
 	Algorithm_parameters(const param_map& params = {}) : parameters(params) {};
 
-	std::string get(const std::string& name);
+	std::string get(const std::string& name) const;
 
-	int get_int(const std::string& name);
+	int get_int(const std::string& name) const;
 
-	double get_double(const std::string& name);
+	double get_double(const std::string& name) const;
 
 	std::string safe_get(const std::string& name, const std::string& backup) const;
 
