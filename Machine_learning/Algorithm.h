@@ -9,6 +9,7 @@
 #define ALGORITHM_H_
 
 #include <map>
+#include <vector>
 #include <string>
 #include <memory>
 #include <type_traits>

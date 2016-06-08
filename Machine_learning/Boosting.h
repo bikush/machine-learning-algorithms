@@ -10,20 +10,23 @@
 
 #include <vector>
 #include <math.h>
+#include <memory>
+#include "Algorithm.h"
 class Data_set;
-#include "Neuralnetwork.h"
 
-class Boosting {
+class Boosting: public Algorithm {
 public:
-	Boosting(int n=4): num_iterations{n}{}
-    void operator()(const Data_set &);
-    void classify(const Data_set &);
-
+	Boosting(const std::vector<Algorithm_parameters> parameters):alg_params{parameters}{}
+	void setup(const Algorithm_parameters& parameters) {boosting_params = parameters;}
+	void learn(const Data_set & data_set);
+	void classify(const Data & d, double & out);
+	void classify_all(const Data_set & test_set);
 	static void run_examples();
 private:
-    double calculate_new_distribution(Neural_network & nn, Data_set & set);
-	int num_iterations;
-	std::vector<std::pair<Neural_network, double>> algorithms;
+    void calculate_new_distribution(Algorithm* alg, Data_set & set);
+	std::vector<std::pair<std::shared_ptr<Algorithm>, double>> algorithms;
+	std::vector<Algorithm_parameters> alg_params;
+	Algorithm_parameters boosting_params;
 };
 
 #endif /* BOOSTING_H_ */
