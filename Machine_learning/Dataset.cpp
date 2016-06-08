@@ -16,35 +16,6 @@
 
 using namespace std;
 
-void Data::print() const{
-	for (auto a : attributes) {
-		cout << a << ": " << values_map.at(a) << endl;
-	}
-}
-
-const int Attribute_set::count_attr_by_usage( Attribute::Attribute_usage usage ) const
-{
-	size_t number = 0;
-	for (auto item : attr_usage) {
-		if (item == usage) {
-			number++;
-		}
-	}
-	return number;
-}
-
-istream & operator>>(istream & is, Data & d) {
-	for (const auto & attr : d.attributes) {
-		string val;
-		if (is >> val) {
-			d.set_value(attr, val);
-		}
-		else {
-			throw runtime_error("Invalid data format");
-		}
-	}
-	return is;
-}
 
 // TODO: move to a utility header
 
@@ -67,6 +38,130 @@ static inline string &trim(string &s) {
 
 // END TODO
 
+
+/*******
+* DATA *
+*******/
+
+void Data::print() const{
+	for (auto a : attributes) {
+		cout << a << ": " << values_map.at(a) << endl;
+	}
+}
+
+istream & operator>>(istream & is, Data & d) {
+	for (const auto & attr : d.attributes) {
+		string val;
+		if (is >> val) {
+			d.set_value(attr, val);
+		}
+		else {
+			throw runtime_error("Invalid data format");
+		}
+	}
+	return is;
+}
+
+/****************
+* ATTRIBUTE SET *
+****************/
+
+vector<string> Attribute_set::get_attributes_of_kind(Attribute::Attribute_usage usage) const
+{
+	vector<string> res;
+	for (size_t i = 0; i<attr_names.size(); i++) {
+		if (attr_usage[i] == usage) {
+			res.push_back(attr_names[i]);
+		}
+	}
+	return res;
+}
+
+const set<string> & Attribute_set::get_attr_values(const string & attr) const {
+	return attr_map.at(attr);
+}
+
+const int Attribute_set::count_attr_by_usage( Attribute::Attribute_usage usage ) const
+{
+	size_t number = 0;
+	for (auto item : attr_usage) {
+		if (item == usage) {
+			number++;
+		}
+	}
+	return number;
+}
+
+void Attribute_set::generate_normalizer() {
+	normalizer.reset();
+	// TODO: figure out what to do with numerical values
+
+	for (auto attribute : attr_names) {
+		normalizer.add_attribute(attribute, get_attr_values(attribute));
+	}
+}
+
+/***********************
+* ATTRIBUTE NORMALIZER *
+***********************/
+
+void Attribute_normalizer::add_attribute(const std::string & attr_name, const std::set<std::string> & values)
+{
+	map<string, double> attribute_transform;
+	if (values.size() == 1) {
+		attribute_transform[(*values.begin())] = 0.0;
+		span[attr_name] = 1.0;
+	}
+	else {
+		double transform_value = 0.0;
+		double increment = 1.0 / (values.size() - 1);
+		span[attr_name] = increment;
+		for (string value : values) {
+			attribute_transform[value] = transform_value;
+			transform_value += increment;
+		}
+	}
+	transform[attr_name] = attribute_transform;
+}
+
+void Attribute_normalizer::normalize(const Data & data, const std::vector<std::string>& attributes, std::vector<double>& output) const
+{
+	output.clear();
+	for (auto attribute : attributes) {
+		auto trans = transform.at(attribute);
+		output.push_back(trans.at(data.get_value(attribute)));
+	}
+}
+
+vector<pair<double, string>> Attribute_normalizer::undo_normalize(const vector<string>& attributes, const vector<double>& values)
+{
+	vector<pair<double, string>> output;
+
+	for (unsigned int i = 0; i < attributes.size(); i++) {
+		string attr_name = attributes[i];
+		double value = values[i];
+
+		auto attr_trans = transform[attr_name];
+		double best_fit = attr_trans.begin()->second;
+		string best_name = attr_trans.begin()->first;
+		for (auto trans_pair : attr_trans) {
+			if (abs(trans_pair.second - value) < abs(best_fit - value)) {
+				best_fit = trans_pair.second;
+				best_name = trans_pair.first;
+			}
+		}
+
+		double accuracy = abs(best_fit - value) / span[attr_name];
+		output.push_back({ accuracy, best_name });
+	}
+
+	return output;
+}
+
+/***********
+* DATA SET *
+************/
+
 Data_set::Data_set(const std::string & l) :label_name{ l } {
 	//std::cout << "Created data set " << l.c_str() << std::endl;
 }
@@ -76,40 +171,8 @@ void Data_set::load_simple_db(const std::string & path)
 	load_simple_db(path, label_name);
 }
 
-struct sort_weights {
-	bool operator() (pair<int, double> left, pair<int, double> right) const {
-		return left.second < right.second;
-	}
-};
-
-//TODO: fix this to calculate real distribution over data!
-void Data_set::set_init_weights(){
-	size_t len = data_set.size();
-	weights.reserve(len);
-	for (size_t i=0; i<len; i++) {
-		weights.push_back(make_pair(i, 1./len));
-	}
-	//sort(weights.begin(), weights.end(), sort_weights{});
-}
-
-void Data_set::set_weights(const std::vector<std::pair<int, double>> & new_w){
-	weights = new_w;
-	sort(weights.begin(), weights.end(), sort_weights{});
-}
-
-struct find_index {
-	int index;
-	find_index(int idx): index{idx} {}
-	bool operator()(pair<int, double> elem) {return elem.first == index;}
-};
-double Data_set::get_weight(int idx) const {
-	auto it = find_if(weights.begin(), weights.end(), find_index{idx});
-	if (it == weights.end()) throw runtime_error("Unexisting weight.");
-	return (*it).second;
-}
-
 // TODO: use some other format for db
-void Data_set::load_simple_db(const std::string & path, const std::string & class_name){
+void Data_set::load_simple_db(const std::string & path, const std::string & class_name) {
 	ifstream ifs{ path };
 	if (!ifs) {
 		throw runtime_error("Input file not found.");
@@ -164,7 +227,7 @@ void Data_set::load_simple_db(const std::string & path, const std::string & clas
 
 void Data_set::shuffle_data()
 {
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	unsigned int seed = (unsigned int)std::chrono::system_clock::now().time_since_epoch().count();
 	shuffle(data_set.begin(), data_set.end(), default_random_engine{ seed });
 }
 
@@ -191,7 +254,7 @@ void Data_set::distribute_split(Data_set & first, Data_set & second, double perc
 	}
 	if (random) {
 		//auto clock = std::chrono::high_resolution_clock{};
-		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+		unsigned int seed = (unsigned int)std::chrono::system_clock::now().time_since_epoch().count();
 		shuffle(indice.begin(), indice.end(), default_random_engine{ seed });
 	}
 
@@ -257,7 +320,7 @@ void Data_set::distribute_boosting(Data_set & new_ds) {
 	int new_len = 0;
 	vector<pair<int,int>> distribution{};
 	for (const auto & w: weights) {
-		int batch = round(w.second*len);
+		int batch = (int)round(w.second*len);
 		new_len += batch;
 		if (new_len > len) {
 			if ((new_len - batch) > 0) {
@@ -281,69 +344,6 @@ void Data_set::distribute_boosting(Data_set & new_ds) {
 	}
 	new_ds.set_weights(weights);
 }
-
-void Attribute_normalizer::add_attribute(const std::string & attr_name, const std::set<std::string> & values)
-{
-	map<string, double> attribute_transform;
-	if (values.size() == 1) {
-		attribute_transform[(*values.begin())] = 0.0;
-		span[attr_name] = 1.0;
-	}
-	else {
-		double transform_value = 0.0;
-		double increment = 1.0 / (values.size() - 1);
-		span[attr_name] = increment;
-		for (string value : values) {
-			attribute_transform[value] = transform_value;
-			transform_value += increment;
-		}
-	}
-	transform[attr_name] = attribute_transform;
-}
-
-void Attribute_normalizer::normalize(const Data & data, const std::vector<std::string>& attributes, std::vector<double>& output) const
-{
-	output.clear();
-	for (auto attribute : attributes) {
-		auto trans = transform.at(attribute);
-		output.push_back( trans.at(data.get_value(attribute)) );
-	}
-}
-
-vector<pair<double, string>> Attribute_normalizer::undo_normalize(const vector<string>& attributes, const vector<double>& values)
-{
-	vector<pair<double, string>> output;
-
-	for (unsigned int i = 0; i < attributes.size(); i++) {
-		string attr_name = attributes[i];
-		double value = values[i];
-
-		auto attr_trans = transform[attr_name];
-		double best_fit = attr_trans.begin()->second;
-		string best_name = attr_trans.begin()->first;
-		for (auto trans_pair : attr_trans) {
-			if (abs(trans_pair.second - value) < abs(best_fit - value)) {
-				best_fit = trans_pair.second;
-				best_name = trans_pair.first;
-			}
-		}
-
-		double accuracy = abs(best_fit - value) / span[attr_name];
-		output.push_back({ accuracy, best_name });
-	}
-
-	return output;
-}
-
-void Attribute_set::generate_normalizer() {
-	normalizer.reset();
-	// TODO: figure out what to do with numerical values
-	
-	for (auto attribute : attr_names) {
-		normalizer.add_attribute(attribute, get_attr_values(attribute));
-	}
-}
-
 
 // TODO: a lot of c/p code, fix this
 void Data_set::normalized_data(std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
@@ -394,6 +394,38 @@ void Data_set::normalized_data_columns(std::vector<std::vector<double>>& inputs,
 	}
 }
 
+struct sort_weights {
+	bool operator() (pair<int, double> left, pair<int, double> right) const {
+		return left.second < right.second;
+	}
+};
+
+//TODO: fix this to calculate real distribution over data!
+void Data_set::set_init_weights() {
+	size_t len = data_set.size();
+	weights.reserve(len);
+	for (size_t i = 0; i<len; i++) {
+		weights.push_back(make_pair(i, 1. / len));
+	}
+	//sort(weights.begin(), weights.end(), sort_weights{});
+}
+
+void Data_set::set_weights(const std::vector<std::pair<int, double>> & new_w) {
+	weights = new_w;
+	sort(weights.begin(), weights.end(), sort_weights{});
+}
+
+struct find_index {
+	int index;
+	find_index(int idx) : index{ idx } {}
+	bool operator()(pair<int, double> elem) { return elem.first == index; }
+};
+double Data_set::get_weight(int idx) const {
+	auto it = find_if(weights.begin(), weights.end(), find_index{ idx });
+	if (it == weights.end()) throw runtime_error("Unexisting weight.");
+	return (*it).second;
+}
+
 vector<int> Data_set::split_by_attr_val(const vector<int> & subset, const string & att, const string & val) const {
 	vector<int> idxs;
 	for (size_t i=0; i<subset.size(); i++) {
@@ -423,6 +455,18 @@ void Data_set::clear()
 	label_name = "";
 	data_set.clear();
 	attr = Attribute_set{};
+}
+
+double Data_set::measure_error(const Data& data, const std::string& guessed_class) const {
+	auto true_class = data.get_value(label_name);
+	return true_class == guessed_class ? 0.0 : 1.0;
+}
+
+double Data_set::measure_error(const Data& data, double guessed_class) const {
+	auto true_class = data.get_value(label_name);
+	vector<double> norm;
+	(attr.get_normalizer()).normalize(data, { label_name }, norm);
+	return abs(guessed_class - norm[0]);
 }
 
 void Data_set::_test_normalize()
@@ -563,30 +607,3 @@ Data_set Data_set::load_zoo()
 	return ds;
 }
 
-double Data_set::measure_error(const Data& data, const std::string& guessed_class) const {
-	auto true_class = data.get_value(label_name);
-	return true_class == guessed_class ? 0.0 : 1.0;
-}
-
-double Data_set::measure_error(const Data& data, double guessed_class) const {
-	auto true_class = data.get_value(label_name);
-	vector<double> norm;
-	(attr.get_normalizer()).normalize(data, { label_name }, norm);
-	return abs(guessed_class - norm[0]);
-}
-
-
-vector<string> Attribute_set::get_attributes_of_kind(Attribute::Attribute_usage usage) const
-{
-	vector<string> res;
-	for (size_t i=0; i<attr_names.size(); i++) {
-		if (attr_usage[i] == usage) {
-			res.push_back(attr_names[i]);
-		}
-	}
-	return res;
-}
-
-const set<string> & Attribute_set::get_attr_values(const string & attr) const{
-	return attr_map.at(attr);
-}
