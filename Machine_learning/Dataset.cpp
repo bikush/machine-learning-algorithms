@@ -167,6 +167,31 @@ vector<pair<double, string>> Attribute_normalizer::undo_normalize(const vector<s
 	return output;
 }
 
+Data Attribute_normalizer::get_unnormalized_data(const vector<string>& attributes, const vector<double>& values)
+{
+	Data d{attributes};
+
+	for (unsigned int i = 0; i < attributes.size(); i++) {
+		string attr_name = attributes[i];
+		double value = values[i];
+
+		auto attr_trans = transform[attr_name];
+		double best_fit = attr_trans.begin()->second;
+		string best_name = attr_trans.begin()->first;
+		for (auto trans_pair : attr_trans) {
+			if (abs(trans_pair.second - value) < abs(best_fit - value)) {
+				best_fit = trans_pair.second;
+				best_name = trans_pair.first;
+			}
+		}
+
+		double accuracy = abs(best_fit - value) / span[attr_name];
+		d.set_value(attr_name, best_name);
+	}
+
+	return d;
+}
+
 // TODO: a lot of c/p code, fix this
 void Attribute_normalizer::normalized_data(const Data_set& data, std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
 {

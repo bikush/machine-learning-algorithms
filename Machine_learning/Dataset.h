@@ -17,7 +17,7 @@
 class Data {
 public:
 	Data(const std::vector<std::string>& atts): attributes{atts}{}
-	
+	std::vector<std::string> get_attributes() {return attributes;}
 	const std::string & get_value(const std::string & att) const { return values_map.at(att);}
 	void set_value(const std::string & att, const std::string & val) {values_map[att] = val;}
 	void print() const;
@@ -55,7 +55,7 @@ public:
 
 	void normalized_data(const Data_set& data, std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
 	void normalized_data_columns(const Data_set& data, std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
-
+	Data get_unnormalized_data(const std::vector<std::string>& attributes, const std::vector<double>& values);
 
 private:
 	std::map<std::string, std::map<std::string, double>> transform;

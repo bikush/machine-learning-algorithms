@@ -48,7 +48,7 @@ public:
 	virtual void setup(const Algorithm_parameters& parameters) = 0;
 	virtual void learn(const Data_set & data_set);
 	virtual void learn(const Data_set & data_set, const Attribute_normalizer& normalizer) = 0;
-	virtual void classify(const Data & d, double & out) = 0;
+	virtual void classify(const Data & d, std::vector<double> & out) = 0;
 };
 
 #endif /* ALGORITHM_H_ */

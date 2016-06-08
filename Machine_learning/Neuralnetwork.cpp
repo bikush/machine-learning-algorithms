@@ -144,8 +144,8 @@ void Neural_network::calculate_outputs() {
 	}
 }
 
-void Neural_network::classify(const Data & d, double & out) {
-	out = 0.0;
+void Neural_network::classify(const Data & d, vector<double> & out) {
+
 }
 
 

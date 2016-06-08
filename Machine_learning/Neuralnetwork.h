@@ -35,12 +35,11 @@ public:
 	virtual void setup(const Algorithm_parameters& param);
 	virtual void learn(const Data_set & data_set, const Attribute_normalizer& normalizer);
 	using Algorithm::learn;
-
+	void classify(const Data & d, std::vector<double> & out);
 	void operator() (const std::vector<std::vector<double>> &, const std::vector<std::vector<double>> &);
 	double get_learning_rate(){return eta;}
 	void set_learning_rate(double lr) {eta = lr;}
 	static void run_examples();
-    void classify(const Data & d, double & out);
 	static double test(Neural_network & nn, const std::vector<double> & inputs, const std::vector<double> & targets);
 	static double test(Neural_network & nn, const Data_set & test_set);
 	std::vector<double> calculate(const std::vector<double> & inputs);

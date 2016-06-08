@@ -72,8 +72,9 @@ void Boosting::calculate_new_distribution(Algorithm* alg, Data_set & set){
 void Boosting::learn(const Data_set &ds) {
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
-	Attribute_normalizer normalizer(ds.attr);
-	normalizer.normalized_data(ds,inputs, outputs);
+	data_normalizer = Attribute_normalizer{ds.attr};
+	data_normalizer.normalized_data(ds,inputs, outputs);
+	attributes = ds.attr.get_attributes_of_kind(Attribute::input);
 	assert(inputs.size()>0);
 	Data_set tmp = ds; /*a database copy :(*/
 	Data_set new_set = tmp; /*another :(*/
@@ -103,24 +104,62 @@ void Boosting::learn(const Data_set &ds) {
 	}
 }
 
-void Boosting::classify(const Data & d, double & out) {
+void Boosting::learn(const Data_set &ds, const  Attribute_normalizer & a_nom) {
+	vector<vector<double>> inputs;
+	vector<vector<double>> outputs;
+	data_normalizer = a_nom;
+	data_normalizer.normalized_data(ds,inputs, outputs);
+	assert(inputs.size()>0);
+	Data_set tmp = ds; /*a database copy :(*/
+	Data_set new_set = tmp; /*another :(*/
 
+	auto out_attrib = tmp.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
+	for (auto attr: out_attrib) {
+		auto vals = tmp.attr.get_attr_values(attr);
+		assert(vals.size() == 2 && "Boosting algorithm supports only binary output.");
+		/*currently algorithm "works" only with binary output. :(*/
+	}
+
+	for (const auto & p: alg_params) {
+		Algorithm * alg;
+		string s = p.get("algorithm");
+		if( s  == "neu_net" ){
+			alg = new Neural_network{};
+		} else {
+			throw runtime_error("Requested algorithm not supported for Boosting.");
+		}
+
+		alg->setup(p);
+
+		/*new learner*/
+		alg->learn(new_set);
+		calculate_new_distribution(alg, tmp);
+		tmp.distribute_boosting(new_set);
+	}
+}
+void Boosting::classify(const Data & d, vector<double> & out) {
+	for (auto alg: algorithms) {
+		alg.first->classify(d, out);
+		for (size_t i=0; i<out.size(); i++){
+			/*expand out[i] to {-1, 1}*/
+			out[i] += (out[i]*2.-1.) * alg.second;
+		}
+	}
 }
 
 void Boosting::classify_all(const Data_set & test_set){
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
-	Attribute_normalizer normalizer(test_set.attr);
-	normalizer.normalized_data(test_set,inputs, outputs);
+	data_normalizer.normalized_data(test_set,inputs, outputs);
 	auto attr_outputs = test_set.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
 	int miss_classified = 0;
 	for (size_t j=0; j<inputs.size(); j++) {
 		vector<double> res(outputs[0].size(), 0.0);
 		vector<double> sum(outputs[0].size(), 0.0);
+		Data d = data_normalizer.get_unnormalized_data(attributes, inputs[j]);
 		for (auto alg: algorithms) {
-			vector<double> out;
-			//Data d = test_set.attr.get_normalizer().
-			alg.first->classify(inputs[j], out);
+			vector<double> out(outputs[0].size(), 0.0);
+			alg.first->classify(d, out);
 			for (size_t i=0; i<out.size(); i++){
 				/*expand out[i] to {-1, 1}*/
 				res[i] += (out[i]*2.-1.) * alg.second;
@@ -134,8 +173,8 @@ void Boosting::classify_all(const Data_set & test_set){
 				res[i] = 0;
 			}
 		}
-		auto res_labels = normalizer.undo_normalize(attr_outputs, res);
-		auto target_labels = normalizer.undo_normalize(attr_outputs, outputs[j]);
+		auto res_labels = data_normalizer.undo_normalize(attr_outputs, res);
+		auto target_labels = data_normalizer.undo_normalize(attr_outputs, outputs[j]);
 		for (size_t i=0; i<res.size(); i++){
 			if (res_labels[i] != target_labels[i] ) {
 				miss_classified++;
