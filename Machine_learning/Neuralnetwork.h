@@ -16,8 +16,10 @@
 #include <iostream>
 #include <sstream>
 #include "Algorithm.h"
+#include "Dataset.h"
 
 class Data_set;
+class Attribute_normalizer;
 
 class Neural_network : public Algorithm {
 public:
@@ -31,7 +33,9 @@ public:
 
 	/*const std::vector<int> & init, double learning_rate=0.01, double acceptable_error=0.01*/
 	virtual void setup(const Algorithm_parameters& param);
-	virtual void learn(const Data_set & data_set);
+	virtual void learn(const Data_set & data_set, const Attribute_normalizer& normalizer);
+	using Algorithm::learn;
+
 	void operator() (const std::vector<std::vector<double>> &, const std::vector<std::vector<double>> &);
 	double get_learning_rate(){return eta;}
 	void set_learning_rate(double lr) {eta = lr;}

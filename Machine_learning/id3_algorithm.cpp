@@ -19,7 +19,7 @@ void id3_algorithm::setup(const Algorithm_parameters& parameters)
 	set_max_depth( max(0, parameters.get_int("depth")) );
 }
 
-void id3_algorithm::learn(const Data_set & data_set)
+void id3_algorithm::learn(const Data_set & data_set, const Attribute_normalizer& normalizer)
 {
 	ds = data_set;
 	class_name = ds.get_label_name();

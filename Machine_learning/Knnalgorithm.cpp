@@ -28,7 +28,7 @@ Knn_algorithm::Knn_algorithm(const std::vector<std::vector<double>> & in,
 Knn_algorithm::Knn_algorithm(const Data_set & data, int nn, distance_function d, bool v)
 	:k{nn}, distance_func{d}, vote{v}
 {
-	learn(data);
+	Algorithm::learn(data);
 }
 
 void Knn_algorithm::classify(const Data & d, double & out) {
@@ -37,9 +37,10 @@ void Knn_algorithm::classify(const Data & d, double & out) {
 void Knn_algorithm::setup(const Algorithm_parameters& parameters) {
 
 };
-void Knn_algorithm::learn(const Data_set & data_set) {
+void Knn_algorithm::learn(const Data_set & data_set, const Attribute_normalizer& normalizer) {
 	//return Knn_algorithm({}, {}, 0, distance_func, vote);
-	data_set.normalized_data(inputs, outputs);
+	this->normalizer = normalizer;
+	this->normalizer.normalized_data(data_set, inputs, outputs);
 	int in_s = inputs.size();
 	int out_s = outputs.size();
 	assert(in_s == out_s);
@@ -52,9 +53,8 @@ void Knn_algorithm::test(const Data_set & test) {
 	vector<vector<double>> out;
 	int miss_labeled = 0;
 	int total = 0;
-	auto normalizer = test.attr.get_normalizer();
 	auto attr_outputs = test.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
-	test.normalized_data(in, out);
+	normalizer.normalized_data(test,in, out);
 	int in_s = in.size();
 	int out_s = out.size();
 	assert(in_s == out_s);

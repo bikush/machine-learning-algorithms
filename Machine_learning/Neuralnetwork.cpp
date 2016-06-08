@@ -76,8 +76,8 @@ double Neural_network::test(Neural_network & nn, const Data_set & test_set)
 {
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
-	test_set.normalized_data(inputs, outputs);
-	auto normalizer = test_set.attr.get_normalizer();
+	Attribute_normalizer normalizer(test_set.attr);
+	normalizer.normalized_data(test_set, inputs, outputs);
 	auto attr_outputs = test_set.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
 
 	int test_size = test_set.get_size();
@@ -197,11 +197,11 @@ void Neural_network::build_network() {
 	}
 }
 
-void Neural_network::learn(const Data_set & data_set) {
+void Neural_network::learn(const Data_set & data_set, const Attribute_normalizer& normalizer) {
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
 
-	data_set.normalized_data(inputs, outputs);
+	normalizer.normalized_data(data_set,inputs, outputs);
 	this->operator()(inputs, outputs);
 }
 

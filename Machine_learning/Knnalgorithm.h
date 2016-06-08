@@ -13,10 +13,12 @@
 #include <algorithm>
 #include <iostream>
 #include "Algorithm.h"
+#include "Dataset.h"
 
 typedef double(*distance_function)(const std::vector<double> &, const std::vector<double> &);
 
 class Data_set;
+class Attribute_normalizer;
 
 class Knn_algorithm : public Algorithm {
 public:
@@ -30,12 +32,15 @@ public:
 
 	void classify(const Data & d, double & out);
 	void setup(const Algorithm_parameters& parameters);
-	void learn(const Data_set & data_set);
+	void learn(const Data_set & data_set, const Attribute_normalizer& normalizer);
+	using Algorithm::learn;
+
 
 	static void run_examples();
 private:
 	std::vector<std::vector<double>> inputs;
 	std::vector<std::vector<double>> outputs;
+	Attribute_normalizer normalizer;
 	int k;
 	distance_function distance_func;
 	bool vote;

@@ -91,7 +91,7 @@ const int Attribute_set::count_attr_by_usage( Attribute::Attribute_usage usage )
 	}
 	return number;
 }
-
+/*
 void Attribute_set::generate_normalizer() {
 	normalizer.reset();
 	// TODO: figure out what to do with numerical values
@@ -99,11 +99,20 @@ void Attribute_set::generate_normalizer() {
 	for (auto attribute : attr_names) {
 		normalizer.add_attribute(attribute, get_attr_values(attribute));
 	}
-}
+}*/
 
 /***********************
 * ATTRIBUTE NORMALIZER *
 ***********************/
+
+Attribute_normalizer::Attribute_normalizer(const Attribute_set & attributes)
+{
+	/*auto all_attributes = attributes.get_all_attributes();
+	for (auto attribute : all_attributes) {
+		add_attribute(attribute, attributes.get_attr_values(attribute));
+	}*/
+}
+
 
 void Attribute_normalizer::add_attribute(const std::string & attr_name, const std::set<std::string> & values)
 {
@@ -156,6 +165,57 @@ vector<pair<double, string>> Attribute_normalizer::undo_normalize(const vector<s
 	}
 
 	return output;
+}
+
+// TODO: a lot of c/p code, fix this
+void Attribute_normalizer::normalized_data(const Data_set& data, std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
+{
+	// TODO: this is a complex problem that needs more thought, or?
+	int size = data.get_size();
+	inputs.reserve(size);
+	outputs.reserve(size);
+
+	auto attr_inputs = data.attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
+	auto attr_outputs = data.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
+
+	vector<double> transformed_data(attr_inputs.size());
+	vector<double> transformed_output(attr_outputs.size());
+
+	//auto normalizer = attr.get_normalizer();
+	
+	for (int i = 0; i < data.get_size(); i++)
+	{
+		const Data& data_elem = data.get_elem(i);
+		normalize(data_elem, attr_inputs, transformed_data);
+		inputs.push_back(transformed_data);
+
+		normalize(data_elem, attr_outputs, transformed_output);
+		outputs.push_back(transformed_output);
+	}
+}
+
+// TODO: a lot of c/p code, fix this
+void Attribute_normalizer::normalized_data_columns(const Data_set& data, std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
+{
+	vector<vector<double>> row_inputs, row_outputs;
+	normalized_data(data, row_inputs, row_outputs);
+
+	int attr_input_size = data.attr.count_attr_by_usage(Attribute::Attribute_usage::input);
+	int attr_output_size = data.attr.count_attr_by_usage(Attribute::Attribute_usage::output);
+
+	int size = data.get_size();
+	for (int input_idx = 0; input_idx < attr_input_size; input_idx++) {
+		inputs.push_back(vector<double>(size));
+		for (int data_idx = 0; data_idx < size; data_idx++) {
+			inputs[input_idx][data_idx] = row_inputs[data_idx][input_idx];
+		}
+	}
+	for (int output_idx = 0; output_idx < attr_output_size; output_idx++) {
+		outputs.push_back(vector<double>(size));
+		for (int data_idx = 0; data_idx < size; data_idx++) {
+			outputs[output_idx][data_idx] = row_outputs[data_idx][output_idx];
+		}
+	}
 }
 
 /***********
@@ -221,7 +281,7 @@ void Data_set::load_simple_db(const std::string & path, const std::string & clas
 		}
 
 	}
-	attr.generate_normalizer();
+	//attr.generate_normalizer();
 	set_init_weights();
 }
 
@@ -345,55 +405,6 @@ void Data_set::distribute_boosting(Data_set & new_ds) {
 	new_ds.set_weights(weights);
 }
 
-// TODO: a lot of c/p code, fix this
-void Data_set::normalized_data(std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
-{
-	// TODO: this is a complex problem that needs more thought, or?
-	int size = get_size();
-	inputs.reserve(size);
-	outputs.reserve(size);
-
-	auto attr_inputs = attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
-	auto attr_outputs = attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
-	
-	vector<double> transformed_data(attr_inputs.size());
-	vector<double> transformed_output(attr_outputs.size());
-
-	auto normalizer = attr.get_normalizer();
-	for (auto data : data_set)
-	{
-		normalizer.normalize(data, attr_inputs, transformed_data);
-		inputs.push_back(transformed_data);
-
-		normalizer.normalize(data, attr_outputs, transformed_output);
-		outputs.push_back(transformed_output);
-	}
-}
-
-// TODO: a lot of c/p code, fix this
-void Data_set::normalized_data_columns(std::vector<std::vector<double>>& inputs, std::vector<std::vector<double>>& outputs) const
-{
-	vector<vector<double>> row_inputs, row_outputs;
-	normalized_data(row_inputs, row_outputs);
-
-	int attr_input_size = attr.count_attr_by_usage(Attribute::Attribute_usage::input);
-	int attr_output_size = attr.count_attr_by_usage(Attribute::Attribute_usage::output);
-
-	int size = get_size();
-	for (int input_idx = 0; input_idx < attr_input_size; input_idx++) {
-		inputs.push_back(vector<double>(size));
-		for (int data_idx = 0; data_idx < size; data_idx++) {
-			inputs[input_idx][data_idx] = row_inputs[data_idx][input_idx];
-		}
-	}
-	for (int output_idx = 0; output_idx < attr_output_size; output_idx++) {
-		outputs.push_back(vector<double>(size));
-		for (int data_idx = 0; data_idx < size; data_idx++) {
-			outputs[output_idx][data_idx] = row_outputs[data_idx][output_idx];
-		}
-	}
-}
-
 struct sort_weights {
 	bool operator() (pair<int, double> left, pair<int, double> right) const {
 		return left.second < right.second;
@@ -465,7 +476,9 @@ double Data_set::measure_error(const Data& data, const std::string& guessed_clas
 double Data_set::measure_error(const Data& data, double guessed_class) const {
 	auto true_class = data.get_value(label_name);
 	vector<double> norm;
-	(attr.get_normalizer()).normalize(data, { label_name }, norm);
+	// TODO: refactor, unoptimal
+	Attribute_normalizer normalizer(attr);
+	normalizer.normalize(data, { label_name }, norm);
 	return abs(guessed_class - norm[0]);
 }
 
@@ -489,7 +502,8 @@ void Data_set::_test_normalize()
 	cout << endl;
 
 	vector<vector<double>> inputs, outputs;
-	ds.normalized_data(inputs, outputs);
+	Attribute_normalizer normalizer(ds.attr);
+	normalizer.normalized_data(ds,inputs, outputs);
 	auto input_attrs = ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input);
 	for (unsigned int i = 0; i < inputs.size(); i++) {
 		Data data = ds.get_elem(i);
@@ -501,8 +515,7 @@ void Data_set::_test_normalize()
 		cout << " class: " << outputs[i][0] << endl << "--------------------------------------" << endl;
 
 		elem[0] = abs(elem[0] - 0.2);
-		auto norm = ds.attr.get_normalizer();
-		auto undo = norm.undo_normalize(input_attrs, elem);
+		auto undo = normalizer.undo_normalize(input_attrs, elem);
 		int undo_idx = 0;
 		for (auto u_item : undo) {
 			cout << input_attrs[undo_idx] << ": " << u_item.second << ", error: " << u_item.first << endl;
@@ -533,7 +546,8 @@ void Data_set::_test_normalize_columns()
 	cout << endl;
 
 	vector<vector<double>> inputs, outputs;
-	ds.normalized_data_columns(inputs, outputs);
+	Attribute_normalizer normalizer(ds.attr);
+	normalizer.normalized_data_columns(ds,inputs, outputs);
 
 	/*cout << "COUNT " << ds.get_size() << endl;
 	cout << "COLUMNS " << inputs.size() << endl;
@@ -557,8 +571,7 @@ void Data_set::_test_normalize_columns()
 		cout << " class: " << outputs[0][i] << endl << "--------------------------------------" << endl;
 
 		inputs[0][i] = abs(inputs[0][i] - 0.2);
-		auto norm = ds.attr.get_normalizer();
-		auto undo = norm.undo_normalize(input_attrs, row);
+		auto undo = normalizer.undo_normalize(input_attrs, row);
 		int undo_idx = 0;
 		for (auto u_item : undo) {
 			cout << input_attrs[undo_idx] << ": " << u_item.second << ", error: " << u_item.first << endl;

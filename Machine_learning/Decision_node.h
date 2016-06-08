@@ -25,7 +25,7 @@ public:
 	// Classifier<string>
 	void classify(const Data & d, double & out);
 	void setup(const Algorithm_parameters& parameters);
-	void learn(const Data_set & data_set);
+	void learn(const Data_set & data_set, const Attribute_normalizer& normalizer);
 
 private:
 	std::string attribute;

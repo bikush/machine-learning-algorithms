@@ -17,8 +17,8 @@ using namespace std;
 double calculate_true_error(Neural_network & nn, const Data_set & test_set, vector<int> & res_v){
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
-	test_set.normalized_data(inputs, outputs);
-	auto normalizer = test_set.attr.get_normalizer();
+	Attribute_normalizer normalizer(test_set.attr);
+	normalizer.normalized_data(test_set,inputs, outputs);
 	auto attr_outputs = test_set.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
 
 	int test_size = test_set.get_size();
@@ -74,7 +74,8 @@ double Boosting::calculate_new_distribution(Neural_network & nn, Data_set & set)
 void Boosting::operator()(const Data_set &ds) {
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
-	ds.normalized_data(inputs, outputs);
+	Attribute_normalizer normalizer(ds.attr);
+	normalizer.normalized_data(ds,inputs, outputs);
 	Data_set tmp = ds; /*a database copy :(*/
 	assert(inputs.size()>0);
 	int num_inputs = inputs[0].size();
@@ -117,8 +118,8 @@ void Boosting::operator()(const Data_set &ds) {
 void Boosting::classify(const Data_set & test_set){
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
-	test_set.normalized_data(inputs, outputs);
-	auto normalizer = test_set.attr.get_normalizer();
+	Attribute_normalizer normalizer(test_set.attr);
+	normalizer.normalized_data(test_set,inputs, outputs);
 	auto attr_outputs = test_set.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
 	int miss_classified = 0;
 	for (size_t j=0; j<inputs.size(); j++) {

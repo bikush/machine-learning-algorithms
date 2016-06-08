@@ -50,7 +50,7 @@ void Decision_node::setup(const Algorithm_parameters & parameters)
 	// Nothing
 }
 
-void Decision_node::learn(const Data_set & data_set)
+void Decision_node::learn(const Data_set & data_set, const Attribute_normalizer& normalizer)
 {
 	// Use id3 class
 }

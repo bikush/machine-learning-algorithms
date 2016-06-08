@@ -13,6 +13,7 @@
 #include <memory>
 #include <type_traits>
 
+class Attribute_normalizer;
 class Data_set;
 class Data;
 
@@ -44,7 +45,8 @@ class Algorithm {
 public:
 	virtual ~Algorithm(){ };
 	virtual void setup(const Algorithm_parameters& parameters) = 0;
-	virtual void learn(const Data_set & data_set) = 0;
+	virtual void learn(const Data_set & data_set);
+	virtual void learn(const Data_set & data_set, const Attribute_normalizer& normalizer) = 0;
 	virtual void classify(const Data & d, double & out) = 0;
 };
 

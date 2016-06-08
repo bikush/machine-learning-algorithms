@@ -41,12 +41,22 @@ struct Attribute{
 	Attribute_usage usage;
 };
 
+class Attribute_set;
+class Data_set;
+
 class Attribute_normalizer {
 public:
+	Attribute_normalizer() {};
+	Attribute_normalizer(const Attribute_set& attributes);
 	void add_attribute( const std::string & attr_name, const std::set<std::string> & values);
 	void normalize(const Data & data, const std::vector<std::string> & attributes, std::vector<double>& output) const;
 	std::vector<std::pair<double,std::string>> undo_normalize(const std::vector<std::string> & attributes, const std::vector<double> & value);
 	void reset() { transform.clear(); };
+
+	void normalized_data(const Data_set& data, std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
+	void normalized_data_columns(const Data_set& data, std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
+
+
 private:
 	std::map<std::string, std::map<std::string, double>> transform;
 	std::map<std::string, double> span;
@@ -66,15 +76,15 @@ public:
 	std::map<std::string, std::set<std::string>> & get_attr_map() {return attr_map;}
 	const std::set<std::string> & get_attr_values(const std::string & attr) const;
 	const int count_attr_by_usage(Attribute::Attribute_usage usage) const;
-	const Attribute_normalizer& get_normalizer() const { return normalizer; };
-	void generate_normalizer();
+	//const Attribute_normalizer& get_normalizer() const { return normalizer; };
+	//void generate_normalizer();
 
 private:
 	std::map<std::string, std::set<std::string>> attr_map;
 	std::vector<std::string> attr_names;
 	std::vector<std::string> attr_types;
 	std::vector<Attribute::Attribute_usage> attr_usage;
-	Attribute_normalizer normalizer;
+	//Attribute_normalizer normalizer;
 };
 
 class Data_set {
@@ -102,9 +112,7 @@ public:
 	std::vector<std::pair<int, double>> get_weights() const { return weights; }
 	double get_weight(int idx) const;
 	void set_weights(const std::vector<std::pair<int, double>> & new_w);
-	void normalized_data( std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs ) const;
-	void normalized_data_columns(std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
-
+	
 	static void _test_normalize();
 	static void _test_normalize_columns();
 	static void _test_distribute_fold();
@@ -114,7 +122,6 @@ public:
 
 	double measure_error(const Data& data, const std::string& guessed_class) const;
 	double measure_error(const Data& data, double guessed_class) const;
-
 	
 private:
 	void define_attr_values(const Data & d);

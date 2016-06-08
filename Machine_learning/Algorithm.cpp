@@ -7,6 +7,7 @@
 
 #include "Algorithm.h"
 #include <algorithm>
+#include "Dataset.h"
 
 using namespace std;
 
@@ -30,4 +31,10 @@ string Algorithm_parameters::safe_get(const string& name, const string& backup) 
 	else {
 		return found_it->second;
 	}
+}
+
+void Algorithm::learn(const Data_set & data_set)
+{
+	Attribute_normalizer normalizer(data_set.attr);
+	learn(data_set, normalizer);
 }
