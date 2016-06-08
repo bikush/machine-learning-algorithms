@@ -30,7 +30,7 @@ public:
 	std::vector<double> operator()(const std::vector<double> & query_point);
 	static constexpr double tolerance=1e-10;
 
-	void classify(const Data & d, double & out);
+	void classify(const Data & d, std::vector<double> & out);
 	void setup(const Algorithm_parameters& parameters);
 	void learn(const Data_set & data_set, const Attribute_normalizer& normalizer);
 	using Algorithm::learn;

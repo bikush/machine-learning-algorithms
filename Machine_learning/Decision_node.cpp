@@ -37,12 +37,12 @@ string Decision_node::classify(const Data & d) {
 	return branches[val].classify(d);
 }
 
-void Decision_node::classify(const Data & d, double & out)
+void Decision_node::classify(const Data & d, std::vector<double> & out)
 {
 	auto result = classify(d);
 	//out = d.normalize(result);
 	// TODO: solve this situation
-	out = 1.0;
+	out.push_back( 1.0 );
 }
 
 void Decision_node::setup(const Algorithm_parameters & parameters)

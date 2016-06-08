@@ -11,7 +11,7 @@ class id3_algorithm : public Algorithm{
 public:
 	id3_algorithm(int depth = 0);
 	
-	void classify(const Data & d, double & out);
+	void classify(const Data & d, std::vector<double> & out);
 	void setup(const Algorithm_parameters& parameters);
 	void learn(const Data_set & data_set, const Attribute_normalizer& normalizer);
 	using Algorithm::learn;

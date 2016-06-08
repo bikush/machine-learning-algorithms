@@ -31,7 +31,7 @@ Knn_algorithm::Knn_algorithm(const Data_set & data, int nn, distance_function d,
 	Algorithm::learn(data);
 }
 
-void Knn_algorithm::classify(const Data & d, double & out) {
+void Knn_algorithm::classify(const Data & d, std::vector<double> & out) {
 
 };
 void Knn_algorithm::setup(const Algorithm_parameters& parameters) {

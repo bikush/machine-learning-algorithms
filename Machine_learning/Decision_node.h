@@ -23,7 +23,7 @@ public:
 	std::string classify(const Data & d);
 
 	// Classifier<string>
-	void classify(const Data & d, double & out);
+	void classify(const Data & d, std::vector<double> & out);
 	void setup(const Algorithm_parameters& parameters);
 	void learn(const Data_set & data_set, const Attribute_normalizer& normalizer);
 

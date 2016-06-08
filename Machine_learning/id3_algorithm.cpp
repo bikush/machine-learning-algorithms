@@ -9,7 +9,7 @@ id3_algorithm::id3_algorithm(int depth)
 	set_max_depth(depth);
 }
 
-void id3_algorithm::classify(const Data & d, double & out)
+void id3_algorithm::classify(const Data & d, std::vector<double> & out)
 {
 	node.classify(d, out);
 }
