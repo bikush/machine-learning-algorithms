@@ -21,12 +21,12 @@ class Data_set;
 
 class Neural_network : public Algorithm {
 public:
-	Neural_network() {std::cout << "constructor" << std::endl;}
-	Neural_network(Neural_network && nn) {std::cout << "move constructor" << std::endl;}
-	void operator=(Neural_network && nn) {std::cout << "move assignment" << std::endl;}
+	Neural_network():eta{0.01}, ok{0.01}, num_layers{0}, epoch_count{1000} {std::cout << "constructor" << std::endl;}
+	Neural_network(Neural_network && nn);
+	Neural_network& operator=(Neural_network && nn);
 
-	Neural_network(const Neural_network & nn) {std::cout << "copy constructor" << std::endl;}
-	void operator=(const Neural_network & nn) {std::cout << "copy assignment" << std::endl;}
+	Neural_network(const Neural_network & nn);
+	Neural_network& operator=(const Neural_network & nn);
 
 
 	/*const std::vector<int> & init, double learning_rate=0.01, double acceptable_error=0.01*/

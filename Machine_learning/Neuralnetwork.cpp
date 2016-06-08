@@ -10,8 +10,50 @@
 #include "Dataset.h"
 #include <chrono>
 #include <algorithm>
+#include <utility>
 
 using namespace std;
+
+Neural_network::Neural_network(Neural_network && nn){
+	eta =  move(nn.eta);
+	ok = move(nn.ok);
+	num_layers = move(nn.num_layers);
+	neurons_per_layer = move(nn.neurons_per_layer);
+	neurons_at_layer = move(nn.neurons_at_layer);
+	epoch_count = move(nn.epoch_count);
+	config = move(nn.config);
+    std::cout << "move constructor" << std::endl;
+}
+
+Neural_network& Neural_network::operator=(Neural_network && nn){
+	eta =  move(nn.eta);
+	ok = move(nn.ok);
+	num_layers = move(nn.num_layers);
+	neurons_per_layer = move(nn.neurons_per_layer);
+	neurons_at_layer = move(nn.neurons_at_layer);
+	epoch_count = move(nn.epoch_count);
+	config = move(nn.config);
+	std::cout << "move assignment" << std::endl;
+	return *this;
+}
+
+Neural_network::Neural_network(const Neural_network & nn)
+	:eta{nn.eta}, ok{nn.ok}, num_layers{nn.num_layers}, neurons_per_layer{nn.neurons_per_layer},
+	 neurons_at_layer{nn.neurons_at_layer}, epoch_count{nn.epoch_count}, config{nn.config} {
+	std::cout << "copy constructor" << std::endl;
+}
+
+Neural_network& Neural_network::operator=(const Neural_network & nn){
+	eta = nn.eta;
+	ok=nn.ok;
+	num_layers = nn.num_layers;
+	neurons_per_layer = nn.neurons_per_layer;
+	neurons_at_layer = nn.neurons_at_layer;
+	epoch_count = nn.epoch_count;
+	config = nn.config;
+	std::cout << "copy assignment" << std::endl;
+	return *this;
+}
 
 double Neural_network::test(Neural_network & nn, const vector<double> & inputs, const vector<double> & targets) {
 	vector<double> res = nn.calculate(inputs);
@@ -411,5 +453,5 @@ void Neural_network::run_examples() {
 	//nn_sine_example(1000);
 
 	//nn_tennis_example( 1000 );
-	nn_zoo_example(2000);
+	nn_zoo_example(5000);
 }
