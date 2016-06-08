@@ -7,14 +7,16 @@
 #include "Algorithm.h"
 #include "Dataset.h"
 
-class id3_algorithm : public Algorithm<Decision_node, std::string>{
+class id3_algorithm : public Algorithm{
 public:
 	id3_algorithm(int depth = 0);
 	
+	void classify(const Data & d, double & out);
 	void setup(const Algorithm_parameters& parameters);
-	Decision_node learn(const Data_set & data_set);
+	void learn(const Data_set & data_set);
 
 	void set_max_depth(int depth);
+	const Decision_node& get_node() const { return node; }
 
 	static void run_examples();
 private:
@@ -28,6 +30,7 @@ private:
 	int max_depth;
 	std::string class_name;
 	std::set<std::string> class_vals;
+	Decision_node node;
 };
 
 #endif

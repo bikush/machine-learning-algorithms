@@ -155,12 +155,12 @@ void Neural_network::build_network() {
 	}
 }
 
-Neural_network Neural_network::learn(const Data_set & data_set) {
+void Neural_network::learn(const Data_set & data_set) {
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
 
 	data_set.normalized_data(inputs, outputs);
-	return this->operator()(inputs, outputs);
+	this->operator()(inputs, outputs);
 }
 
 double activation_func_der(double out) {
@@ -221,7 +221,7 @@ bool Neural_network::back_propagation(const vector<double> & targets) {
 	return res;
 }
 
-Neural_network Neural_network::operator() (const vector<vector<double>> & inputs, const vector<vector<double>> & outputs){
+void Neural_network::operator() (const vector<vector<double>> & inputs, const vector<vector<double>> & outputs){
 	size_t data_size = inputs.size();
 	assert (data_size > 0);
 	assert(data_size == outputs.size());
@@ -268,7 +268,6 @@ Neural_network Neural_network::operator() (const vector<vector<double>> & inputs
 	cout << "total duration " << total_duration.count() << "s" << endl;
 	cout << "calc " << calculation << "s (" << 100.0 * calculation / total_duration.count() << "%)" << endl;
 	cout << "back " << backpropagation << "s (" << 100.0 *  backpropagation / total_duration.count() << "%)" << endl;
-	return *this;
 }
 
 /*******************

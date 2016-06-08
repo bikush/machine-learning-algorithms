@@ -9,12 +9,17 @@ id3_algorithm::id3_algorithm(int depth)
 	set_max_depth(depth);
 }
 
+void id3_algorithm::classify(const Data & d, double & out)
+{
+	node.classify(d, out);
+}
+
 void id3_algorithm::setup(const Algorithm_parameters& parameters)
 {
 	set_max_depth( max(0, parameters.get_int("depth")) );
 }
 
-Decision_node id3_algorithm::learn(const Data_set & data_set)
+void id3_algorithm::learn(const Data_set & data_set)
 {
 	ds = data_set;
 	class_name = ds.get_label_name();
@@ -26,7 +31,7 @@ Decision_node id3_algorithm::learn(const Data_set & data_set)
 		subset.push_back(i);
 	}
 
-	return calculate(subset, ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input), max_depth);
+	node = calculate(subset, ds.attr.get_attributes_of_kind(Attribute::Attribute_usage::input), max_depth);
 }
 
 void id3_algorithm::set_max_depth(int depth)
@@ -161,7 +166,8 @@ void repeat_test( int reps = 50 ) {
 		ds.distribute_split(train, test, 0.65, true);
 
 		id3_algorithm id3_alg(1);
-		Decision_node root = id3_alg.learn(train);
+		id3_alg.learn(train);
+		auto root = id3_alg.get_node();
 
 		root.print();
 		cout << endl;
@@ -190,8 +196,9 @@ void id3_test(string file_name, string class_name, string name) {
 
 	cout << "data length: " << ds.get_size() << endl;
 	cout << "train data length: " << train.get_size() << endl;
-	id3_algorithm id3;
-	Decision_node root = id3.learn(train);
+	id3_algorithm id3_alg;
+	id3_alg.learn(train);
+	auto root = id3_alg.get_node();
 
 	root.print();
 

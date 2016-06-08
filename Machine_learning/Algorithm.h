@@ -37,19 +37,15 @@ template<class T>
 class Classifier {
 public:
 	virtual ~Classifier(){};
-    virtual void classify(const Data & d, T & out) = 0;
+	// stump until ready to remove
 };
 
-template<class T, class D>
 class Algorithm {
 public:
-	virtual ~Algorithm(){ 
-		static_assert(std::is_base_of<Classifier<D>, T>::value,
-			          "class T not derived from Classifier");
-	};
-	typedef D class_type;
+	virtual ~Algorithm(){ };
 	virtual void setup(const Algorithm_parameters& parameters) = 0;
-	virtual T learn(const Data_set & data_set) = 0;
+	virtual void learn(const Data_set & data_set) = 0;
+	virtual void classify(const Data & d, double & out) = 0;
 };
 
 #endif /* ALGORITHM_H_ */

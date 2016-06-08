@@ -37,7 +37,20 @@ string Decision_node::classify(const Data & d) {
 	return branches[val].classify(d);
 }
 
-void Decision_node::classify(const Data & d, std::string & out)
+void Decision_node::classify(const Data & d, double & out)
 {
-	out = classify(d);
+	auto result = classify(d);
+	//out = d.normalize(result);
+	// TODO: solve this situation
+	out = 1.0;
+}
+
+void Decision_node::setup(const Algorithm_parameters & parameters)
+{
+	// Nothing
+}
+
+void Decision_node::learn(const Data_set & data_set)
+{
+	// Use id3 class
 }

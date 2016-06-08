@@ -13,7 +13,7 @@
 #include "Dataset.h"
 #include "Algorithm.h"
 
-class Decision_node : public Classifier<std::string> {
+class Decision_node : public Algorithm {
 public:
 	Decision_node(){}
 	Decision_node(const std::string & attr, bool leaf=false, const std::string& leaf_value = ""):
@@ -23,7 +23,9 @@ public:
 	std::string classify(const Data & d);
 
 	// Classifier<string>
-	void classify(const Data & d, std::string & out);
+	void classify(const Data & d, double & out);
+	void setup(const Algorithm_parameters& parameters);
+	void learn(const Data_set & data_set);
 
 private:
 	std::string attribute;

@@ -18,7 +18,7 @@ typedef double(*distance_function)(const std::vector<double> &, const std::vecto
 
 class Data_set;
 
-class Knn_algorithm : public Classifier<double>, public Algorithm<Knn_algorithm, double> {
+class Knn_algorithm : public Algorithm {
 public:
 	Knn_algorithm(const std::vector<std::vector<double>> & in,
 		      const std::vector<std::vector<double>> & out,
@@ -30,7 +30,7 @@ public:
 
 	void classify(const Data & d, double & out);
 	void setup(const Algorithm_parameters& parameters);
-	Knn_algorithm learn(const Data_set & data_set);
+	void learn(const Data_set & data_set);
 
 	static void run_examples();
 private:

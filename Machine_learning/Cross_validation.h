@@ -8,7 +8,7 @@
 #include "Dataset.h"
 #include "Algorithm.h"
 #include "id3_algorithm.h"
-
+/*
 class Spoof_classifier:public Classifier<double> {
 public:
 	Spoof_classifier(double f=1.): error{f}{}
@@ -42,7 +42,7 @@ public:
 	virtual Spoof_classifier learn(const Data_set & data_set) {
 		return Spoof_classifier(parameters.get_double("error"));
 	}
-};
+};*/
 
 class Cross_validation
 {
@@ -79,7 +79,7 @@ public:
 	static void test() {
 		//Spoof_la spoof;
 		// TODO: fix the example?
-		Algorithm_parameters params{ {std::pair<std::string,std::string>("error","0.15")} };
+	/*	Algorithm_parameters params{ {std::pair<std::string,std::string>("error","0.15")} };
 		Data_set data("data1");
 		Data fake_data{ {"data1","data2"} };
 		fake_data.set_value("data1", "one");
@@ -109,7 +109,7 @@ public:
 	}
 
 	static void id3_test() {
-		Algorithm_parameters params{ { std::pair<std::string,std::string>("depth","1") } };
+	/*	Algorithm_parameters params{ { std::pair<std::string,std::string>("depth","1") } };
 		Data_set data = Data_set::load_zoo();
 		data.shuffle_data();
 
@@ -122,7 +122,7 @@ public:
 			}
 			error /= result.size();
 			std::cout << ", error: " << error << std::endl;
-		}
+		}*/
 	}
 
 	static void run_examples() {

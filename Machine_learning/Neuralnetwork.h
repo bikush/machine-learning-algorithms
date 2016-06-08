@@ -19,7 +19,7 @@
 
 class Data_set;
 
-class Neural_network:public Algorithm<Neural_network, double>, public Classifier<double> {
+class Neural_network : public Algorithm {
 public:
 	Neural_network() {std::cout << "constructor" << std::endl;}
 	Neural_network(Neural_network && nn) {std::cout << "move constructor" << std::endl;}
@@ -31,8 +31,8 @@ public:
 
 	/*const std::vector<int> & init, double learning_rate=0.01, double acceptable_error=0.01*/
 	virtual void setup(const Algorithm_parameters& param);
-	virtual Neural_network learn(const Data_set & data_set);
-	Neural_network operator() (const std::vector<std::vector<double>> &, const std::vector<std::vector<double>> &);
+	virtual void learn(const Data_set & data_set);
+	void operator() (const std::vector<std::vector<double>> &, const std::vector<std::vector<double>> &);
 	double get_learning_rate(){return eta;}
 	void set_learning_rate(double lr) {eta = lr;}
 	static void run_examples();
