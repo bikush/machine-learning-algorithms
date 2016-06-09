@@ -105,12 +105,12 @@ void Attribute_set::generate_normalizer() {
 * ATTRIBUTE NORMALIZER *
 ***********************/
 
-Attribute_normalizer::Attribute_normalizer(const Attribute_set & attributes)
+Attribute_normalizer::Attribute_normalizer(const Attribute_set & attributes): attr_set{attributes}
 {
-	/*auto all_attributes = attributes.get_all_attributes();
+	auto all_attributes = attributes.get_all_attributes();
 	for (auto attribute : all_attributes) {
 		add_attribute(attribute, attributes.get_attr_values(attribute));
-	}*/
+	}
 }
 
 
@@ -184,8 +184,6 @@ Data Attribute_normalizer::get_unnormalized_data(const vector<string>& attribute
 				best_name = trans_pair.first;
 			}
 		}
-
-		double accuracy = abs(best_fit - value) / span[attr_name];
 		d.set_value(attr_name, best_name);
 	}
 

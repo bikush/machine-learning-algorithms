@@ -17,7 +17,6 @@
 class Data {
 public:
 	Data(const std::vector<std::string>& atts): attributes{atts}{}
-	std::vector<std::string> get_attributes() {return attributes;}
 	const std::string & get_value(const std::string & att) const { return values_map.at(att);}
 	void set_value(const std::string & att, const std::string & val) {values_map[att] = val;}
 	void print() const;
@@ -41,26 +40,8 @@ struct Attribute{
 	Attribute_usage usage;
 };
 
-class Attribute_set;
+
 class Data_set;
-
-class Attribute_normalizer {
-public:
-	Attribute_normalizer() {};
-	Attribute_normalizer(const Attribute_set& attributes);
-	void add_attribute( const std::string & attr_name, const std::set<std::string> & values);
-	void normalize(const Data & data, const std::vector<std::string> & attributes, std::vector<double>& output) const;
-	std::vector<std::pair<double,std::string>> undo_normalize(const std::vector<std::string> & attributes, const std::vector<double> & value);
-	void reset() { transform.clear(); };
-
-	void normalized_data(const Data_set& data, std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
-	void normalized_data_columns(const Data_set& data, std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
-	Data get_unnormalized_data(const std::vector<std::string>& attributes, const std::vector<double>& values);
-
-private:
-	std::map<std::string, std::map<std::string, double>> transform;
-	std::map<std::string, double> span;
-};
 
 class Attribute_set {
 public:
@@ -85,6 +66,25 @@ private:
 	std::vector<std::string> attr_types;
 	std::vector<Attribute::Attribute_usage> attr_usage;
 	//Attribute_normalizer normalizer;
+};
+
+
+class Attribute_normalizer {
+public:
+	Attribute_normalizer() {};
+	Attribute_normalizer(const Attribute_set& attributes);
+	void add_attribute( const std::string & attr_name, const std::set<std::string> & values);
+	void normalize(const Data & data, const std::vector<std::string> & attributes, std::vector<double>& output) const;
+	std::vector<std::pair<double,std::string>> undo_normalize(const std::vector<std::string> & attributes, const std::vector<double> & value);
+	void reset() { transform.clear(); };
+
+	void normalized_data(const Data_set& data, std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
+	void normalized_data_columns(const Data_set& data, std::vector<std::vector<double>> & inputs, std::vector<std::vector<double>> & outputs) const;
+	Data get_unnormalized_data(const std::vector<std::string>& attributes, const std::vector<double>& values);
+	Attribute_set attr_set;
+private:
+	std::map<std::string, std::map<std::string, double>> transform;
+	std::map<std::string, double> span;
 };
 
 class Data_set {
