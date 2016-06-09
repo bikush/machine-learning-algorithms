@@ -8,67 +8,56 @@
 #include "Dataset.h"
 #include "Algorithm.h"
 #include "id3_algorithm.h"
-/*
-class Spoof_classifier:public Classifier<double> {
-public:
-	Spoof_classifier(double f=1.): error{f}{}
-	Spoof_classifier(Spoof_classifier && sc) {error = sc.error;}
-	void operator=(Spoof_classifier && sc) {error = sc.error;}
 
-	Spoof_classifier(const Spoof_classifier & sc) {error = sc.error;}
-	void operator=(const Spoof_classifier & sc) {error = sc.error;}
 
-    void classify(const Data & d, double & out) {
-		int seed = (int)std::chrono::system_clock::now().time_since_epoch().count();
-		out = std::min( std::max( error + ((seed % 100)-50) / 1000.0, 0.0 ), 1.0);
-    }
-private:
-	double error;
-	Data_set xd;
-};
-
-class Spoof_la : public Algorithm<Spoof_classifier, double> {
+class Spoof_algorithm : public Algorithm {
 private:
 	Algorithm_parameters parameters;
+	double error;
+	Data_set xd;
 
 public:
-	Spoof_la():Algorithm{} {
+	Spoof_algorithm():Algorithm{} {
 	}
 
-	virtual void setup(const Algorithm_parameters& param) {
+	void classify(const Data & d, std::vector<double> & out) {
+		int seed = (int)std::chrono::system_clock::now().time_since_epoch().count();
+		out.push_back( std::min(std::max(error + ((seed % 100) - 50) / 1000.0, 0.0), 1.0) );
+	}
+
+	void setup(const Algorithm_parameters& param) {
 		parameters = param;
 	}
 
-	virtual Spoof_classifier learn(const Data_set & data_set) {
-		return Spoof_classifier(parameters.get_double("error"));
+	void learn(const Data_set & data_set, const Attribute_normalizer& normalizer) {
+		// nothing
 	}
-};*/
+};
 
 class Cross_validation
 {
 public:
-	template<class T>
-	static std::vector<double> k_fold_t(const Data_set& data_set, const Algorithm_parameters& param, int k) {
-		T algorithm;
-		algorithm.setup(param);
-		return k_fold(data_set, algorithm, k);
-	}
-
+	
 	template <class T>
-	static std::vector<double> k_fold(const Data_set& data_set, T & algorithm, int k) {
+	static std::vector<double> k_fold(const Data_set& data_set, const Algorithm_parameters& param, int k) {
 		k = k < 2 ? 2 : (k > data_set.get_size() ? data_set.get_size() : k);
 		Data_set train, validate;
 		std::vector<double> errors(k);
 		for (int fold = 0; fold < k; fold++) {
 			data_set.distribute_fold(train, validate, k, fold);
-			auto classifier = algorithm.learn(train);
+
+			T algorithm;
+			algorithm.setup(param);
+			algorithm.learn(train);
+
 			double avg_error = 0.0;
 			for (int val_idx = 0; val_idx < validate.get_size(); val_idx++) {
 				auto data = validate.get_elem(val_idx);
-				typename T::class_type class_guess;
-				classifier.classify( data, class_guess);
-				double error = data_set.measure_error(data, class_guess);
-				avg_error += error;
+				
+				std::vector<double> out;
+				classifier.classify( data, out );
+				//double error = data_set.measure_error(data, class_guess);
+				//avg_error += error;
 			}
 			avg_error /= validate.get_size();
 			errors[fold] = avg_error;
