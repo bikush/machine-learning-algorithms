@@ -9,12 +9,13 @@
 #include "Dataset.h"
 #include <iostream>
 #include "Neuralnetwork.h"
+#include "id3_algorithm.h"
 using namespace std;
 
 /*
  * This is probably not correct!
  * */
-double calculate_true_error(Algorithm & alg, const Data_set & test_set, vector<int> & res_v){
+double Boosting::calculate_true_error(Algorithm & alg, const Data_set & test_set, vector<int> & res_v){
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
 	Attribute_normalizer normalizer(test_set.attr);
@@ -26,7 +27,10 @@ double calculate_true_error(Algorithm & alg, const Data_set & test_set, vector<i
 	double total_error = 0.0;
 	int missclassified = 0;
 	for (int test_idx = 0; test_idx < test_size; test_idx++) {
-		vector<double> res = vector<double>{0.0}; //alg.classify(inputs[test_idx]);
+		vector<double> res;
+		Data d = data_normalizer.get_unnormalized_data(test_set.attr.get_attributes_of_kind(Attribute::input),
+													   inputs[test_idx]);
+		alg.classify(d, res);
 		vector<double> target = outputs[test_idx];
 
 		auto res_labels = normalizer.undo_normalize(attr_outputs, res);
@@ -47,14 +51,18 @@ double calculate_true_error(Algorithm & alg, const Data_set & test_set, vector<i
 	return true_error;
 }
 
-void Boosting::calculate_new_distribution(Algorithm* alg, Data_set & set){
+bool Boosting::calculate_new_distribution(Algorithm* alg, Data_set & set){
 	/*calculate true error*/
 	vector<int> res;
 	double epsilon = calculate_true_error(*alg, set, res);
-	double alpha = (epsilon>0.)?0.5*log((1.-epsilon)/epsilon):1000;
+	if (epsilon - 0.5 >= 0.) throw runtime_error("Weak learner is not good enough!.");
+	epsilon = (epsilon > 0.0)? epsilon: 0.0001;
+	double alpha = 0.5*log((1.-epsilon)/epsilon);
 	cout << "alpha: " << alpha << endl;
 	shared_ptr<Algorithm> p{alg};
 	algorithms.push_back(make_pair(p, alpha));
+	num_algorithms++;
+	if (epsilon < 0.0001) return true;
 	/*calculate new weights*/
 	vector<pair<int, double>> new_weights;
 	double sum = 0.0;
@@ -67,6 +75,7 @@ void Boosting::calculate_new_distribution(Algorithm* alg, Data_set & set){
 		new_weights[i].second /= sum;
 	}
 	set.set_weights(new_weights);
+	return false;
 }
 
 void Boosting::learn(const Data_set &ds) {
@@ -74,34 +83,8 @@ void Boosting::learn(const Data_set &ds) {
 	vector<vector<double>> outputs;
 	data_normalizer = Attribute_normalizer{ds.attr};
 	data_normalizer.normalized_data(ds,inputs, outputs);
-	attributes = ds.attr.get_attributes_of_kind(Attribute::input);
 	assert(inputs.size()>0);
-	Data_set tmp = ds; /*a database copy :(*/
-	Data_set new_set = tmp; /*another :(*/
-
-	auto out_attrib = tmp.attr.get_attributes_of_kind(Attribute::Attribute_usage::output);
-	for (auto attr: out_attrib) {
-		auto vals = tmp.attr.get_attr_values(attr);
-		assert(vals.size() == 2 && "Boosting algorithm supports only binary output.");
-		/*currently algorithm "works" only with binary output. :(*/
-	}
-
-	for (const auto & p: alg_params) {
-		Algorithm * alg;
-		string s = p.get("algorithm");
-		if( s  == "neu_net" ){
-			alg = new Neural_network{};
-		} else {
-			throw runtime_error("Requested algorithm not supported for Boosting.");
-		}
-
-		alg->setup(p);
-
-		/*new learner*/
-		alg->learn(new_set);
-		calculate_new_distribution(alg, tmp);
-		tmp.distribute_boosting(new_set);
-	}
+	common(ds);
 }
 
 void Boosting::learn(const Data_set &ds, const  Attribute_normalizer & a_nom) {
@@ -110,6 +93,10 @@ void Boosting::learn(const Data_set &ds, const  Attribute_normalizer & a_nom) {
 	data_normalizer = a_nom;
 	data_normalizer.normalized_data(ds,inputs, outputs);
 	assert(inputs.size()>0);
+	common(ds);
+}
+
+void Boosting::common(const Data_set &ds){
 	Data_set tmp = ds; /*a database copy :(*/
 	Data_set new_set = tmp; /*another :(*/
 
@@ -119,12 +106,13 @@ void Boosting::learn(const Data_set &ds, const  Attribute_normalizer & a_nom) {
 		assert(vals.size() == 2 && "Boosting algorithm supports only binary output.");
 		/*currently algorithm "works" only with binary output. :(*/
 	}
-
 	for (const auto & p: alg_params) {
 		Algorithm * alg;
 		string s = p.get("algorithm");
 		if( s  == "neu_net" ){
 			alg = new Neural_network{};
+		} else if ( s == "id3") {
+			alg = new id3_algorithm{};
 		} else {
 			throw runtime_error("Requested algorithm not supported for Boosting.");
 		}
@@ -133,10 +121,13 @@ void Boosting::learn(const Data_set &ds, const  Attribute_normalizer & a_nom) {
 
 		/*new learner*/
 		alg->learn(new_set);
-		calculate_new_distribution(alg, tmp);
+		if (calculate_new_distribution(alg, tmp)) {
+			break;
+		}
 		tmp.distribute_boosting(new_set);
 	}
 }
+
 void Boosting::classify(const Data & d, vector<double> & out) {
 	for (auto alg: algorithms) {
 		alg.first->classify(d, out);
@@ -156,7 +147,7 @@ void Boosting::classify_all(const Data_set & test_set){
 	for (size_t j=0; j<inputs.size(); j++) {
 		vector<double> res(outputs[0].size(), 0.0);
 		vector<double> sum(outputs[0].size(), 0.0);
-		Data d = data_normalizer.get_unnormalized_data(attributes, inputs[j]);
+		Data d = data_normalizer.get_unnormalized_data(test_set.attr.get_attributes_of_kind(Attribute::input), inputs[j]);
 		for (auto alg: algorithms) {
 			vector<double> out(outputs[0].size(), 0.0);
 			alg.first->classify(d, out);
@@ -165,7 +156,6 @@ void Boosting::classify_all(const Data_set & test_set){
 				res[i] += (out[i]*2.-1.) * alg.second;
 			}
 		}
-		cout << "res: " << res[0] << endl;
 		for (size_t i=0; i<res.size(); i++){
 			if (res[i] > 0) {
 				res[i] = 1.;
@@ -189,21 +179,34 @@ void Boosting::classify_all(const Data_set & test_set){
 /*******************
  * E X A M P L E S *
  *******************/
-/*
-void boost_tennis_example(int iterations = 5) {
+
+void boost_tennis_example(int iterations = 10) {
 	//Data_set::_test_normalize_columns();
 
-	string file_name = "../data/tealgis.txt";
+	string file_name = "../data/tennis.txt";
 	string class_name = "Play";
 	Data_set ds;
 	ds.load_simple_db(file_name, class_name);
 
 	Data_set train, test;
-	ds.distribute_split(train, test, 0.6);
+	ds.distribute_split(train, test, 0.6, true);
+	vector<Algorithm_parameters> attr;
+	map<string, string> p;
 
-	Boosting boost{ iterations };
-	boost(train);
-	boost.classify(test);
+	p["algorithm"] = "neu_net";
+	p["eta"] = "0.2";
+	p["tolerance"] = "0.01";
+	p["epoch_count"] = "1000";
+	p["config"] = " 4 1 1 ";
+	/**//*
+	p["algorithm"] ="id3";
+	p["depth"] = "1"; /**/
+	for (int i=0; i<iterations; i++) {
+		attr.push_back(Algorithm_parameters{p});
+	}
+	Boosting boost{attr};
+	boost.learn(train);
+	boost.classify_all(test);
 }
 
 void boost_zoo_example(int iterations = 5) {
@@ -214,14 +217,21 @@ void boost_zoo_example(int iterations = 5) {
 
 	Data_set train, test;
 	ds.distribute_split(train, test, 0.8);
-
-	Boosting boost{ iterations };
-	boost(train);
-	boost.classify(test);
-}*/
+	vector<Algorithm_parameters> attr;
+	map<string, string> p;
+	p["algorithm"] = "neu_net";
+	p["eta"] = "0.01";
+	p["tolerance"] = "0.01";
+	p["epoch_count"] = "1000";
+	p["config"] = " 16 1 1 ";
+	for (int i=0; i<iterations; i++) {
+		attr.push_back(Algorithm_parameters{p});
+	}
+	Boosting boost{attr};
+	boost.learn(train);
+	boost.classify_all(test);
+}
 
 void Boosting::run_examples() {
-	//boost_tennis_example();
-
-	//boost_zoo_example(); /*cannot work, the output is not binary!*/
+	boost_tennis_example(10);
 }
