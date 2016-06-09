@@ -106,10 +106,11 @@ double Neural_network::test(Neural_network & nn, const Data_set & test_set)
 		total_error += coumpound_error / res.size();
 	}
 	total_error /= test_size;
+	/*
 	cout << "Total error: " << total_error << endl;
 	cout << "Misslabel count: " << misslabel_count << " (" << double(misslabel_count)/test_size << ")" << endl;
 	cout << "Only misslabel error: " << misslabel_error / test_size << endl;
-
+	 */
 	return double(misslabel_count) / test_size;
 }
 
@@ -145,7 +146,10 @@ void Neural_network::calculate_outputs() {
 }
 
 void Neural_network::classify(const Data & d, vector<double> & out) {
-
+	vector<double> inputs;
+	vector<string> attr = data_normalizer.attr_set.get_attributes_of_kind(Attribute::input);
+	data_normalizer.normalize(d, attr, inputs);
+	out = calculate(inputs);
 }
 
 
@@ -197,11 +201,19 @@ void Neural_network::build_network() {
 	}
 }
 
+void Neural_network::learn(const Data_set & data_set) {
+	vector<vector<double>> inputs;
+	vector<vector<double>> outputs;
+	data_normalizer = Attribute_normalizer{data_set.attr};
+	data_normalizer.normalized_data(data_set,inputs, outputs);
+	this->operator()(inputs, outputs);
+}
+
 void Neural_network::learn(const Data_set & data_set, const Attribute_normalizer& normalizer) {
 	vector<vector<double>> inputs;
 	vector<vector<double>> outputs;
-
-	normalizer.normalized_data(data_set,inputs, outputs);
+	data_normalizer = normalizer;
+	data_normalizer.normalized_data(data_set,inputs, outputs);
 	this->operator()(inputs, outputs);
 }
 
@@ -307,9 +319,11 @@ void Neural_network::operator() (const vector<vector<double>> & inputs, const ve
 	}
 
 	std::chrono::duration<double> total_duration = std::chrono::high_resolution_clock::now() - total_start;
+	/*
 	cout << "total duration " << total_duration.count() << "s" << endl;
 	cout << "calc " << calculation << "s (" << 100.0 * calculation / total_duration.count() << "%)" << endl;
 	cout << "back " << backpropagation << "s (" << 100.0 *  backpropagation / total_duration.count() << "%)" << endl;
+	*/
 }
 
 /*******************
@@ -402,13 +416,12 @@ void nn_tennis_example(int iterations = 1000) {
 	string class_name = "Play";
 	Data_set ds;
 	ds.load_simple_db(file_name, class_name);
-
 	Data_set train, test;
-	ds.distribute_split(train, test, 0.8);
+	ds.distribute_split(train, test, 0.6, true);
 
 	Neural_network nn{};
 	map<string, string> p;
-	p["eta"] = "0.01";
+	p["eta"] = "0.1";
 	p["tolerance"] = "0.01";
 	p["epoch_count"] = to_string(iterations);
 	string s = to_string(train.attr.count_attr_by_usage(Attribute::Attribute_usage::input));
@@ -429,7 +442,8 @@ void nn_zoo_example(int iterations = 1000) {
 	ds.load_simple_db(file_name, class_name);
 
 	Data_set train, test;
-	ds.distribute_split(train, test, 0.8);
+	ds.shuffle_data();
+	ds.distribute_split(train, test, 0.6);
 
 	Neural_network nn{};
 	map<string, string> p;
@@ -452,6 +466,6 @@ void Neural_network::run_examples() {
 	/*sine example:*/
 	//nn_sine_example(1000);
 
-	//nn_tennis_example( 1000 );
+	//nn_tennis_example(5000 );
 	nn_zoo_example(5000);
 }

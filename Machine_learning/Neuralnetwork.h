@@ -33,6 +33,7 @@ public:
 
 	/*const std::vector<int> & init, double learning_rate=0.01, double acceptable_error=0.01*/
 	virtual void setup(const Algorithm_parameters& param);
+	virtual void learn(const Data_set & data_set);
 	virtual void learn(const Data_set & data_set, const Attribute_normalizer& normalizer);
 	using Algorithm::learn;
 	void classify(const Data & d, std::vector<double> & out);
@@ -58,5 +59,6 @@ private:
 	void build_network();
 	bool is_bias(int layer, int idx){return (config[layer] == idx);}
 	void set_weight(double w, const Edge_key & k);
+	Attribute_normalizer data_normalizer;
 };
 #endif /* NEURALNETWORK_H_ */
